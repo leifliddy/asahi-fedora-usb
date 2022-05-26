@@ -2,15 +2,15 @@ Creates a Fedora usb drive that will boot on Apple M1 systems.
 
 To build a minimal Fedora image and install it to a usb drive, simply run:
 ```
-./build -d /dev/sda
+./build.sh -d /dev/sda
 ```
 
 **substitute ```/dev/sda``` with the device id of your usb drive
 
 Upon completion, you can mount and unmount the usb drive (which contains 3 partitions) to/from ```mnt_usb/``` with 
 ```
-./build mount
-./build umount
+./build.sh mount
+./build.sh umount
 ```
 
 To boot the usb drive on an M1 system, enter the following ```u-boot``` command and boot time:
