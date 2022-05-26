@@ -7,7 +7,7 @@ To build a minimal Fedora image and install it to a usb drive, simply run:
 
 **substitute ```/dev/sda``` with the device id of your usb drive
 
-Upon completion, you can mount and unmount the usb drive (which contains 3 partition) to/from ```mnt_usb/``` with 
+Upon completion, you can mount and unmount the usb drive (which contains 3 partitions) to/from ```mnt_usb/``` with 
 ```
 ./build mount
 ./build umount
