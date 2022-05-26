@@ -136,6 +136,8 @@ install_usb() {
     chroot $mnt_usb /image.creation/setup-services
     echo "### Enabling system services..."
     chroot $mnt_usb systemctl enable iwd.service sshd.service systemd-networkd.service
+    # remove .gitignore file
+    rm -f $mnt_usb/boot/efi/vendorfw/.gitignore
     find $mnt_usb/boot/efi/ -type f | xargs chmod 700
     rm -rf $mnt_usb/image.creation
     echo '### Unmounting usb partitions...'
