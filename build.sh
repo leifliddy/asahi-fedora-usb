@@ -43,7 +43,7 @@ mount_usb() {
         # otherwise mount via the device id
         if [ -z $usb_device ]; then
             echo -e "\nthe usb device can't be mounted via the uuid values"
-            echo -e "\ntherefore you must specify the usb device ie\n./build -d /dev/sda mount\n"
+            echo -e "\ntherefore you must specify the usb device ie\n./build.sh -d /dev/sda mount\n"
             exit
         fi
         [[ -z "$(findmnt -n $mnt_usb)" ]] && mount "$usb_device"3 $mnt_usb
@@ -61,9 +61,9 @@ umount_usb() {
 }
 
 
-# ./build mount
+# ./build.sh mount
 #  or
-# ./build umount
+# ./build.sh umount
 #  to mount or unmount a usb drive (that was previously created by this script) to/from mnt_usb/
 if [[ $1 == 'mount' ]]; then
     mount_usb
@@ -74,7 +74,7 @@ elif [[ $1 == 'umount' ]] || [[ $1 == 'unmount' ]]; then
 fi
 
 
-[[ -z $usb_device ]] && echo -e "\nyou must specify a usb device ie\n./build -d /dev/sda\n" && exit
+[[ -z $usb_device ]] && echo -e "\nyou must specify a usb device ie\n./build.sh -d /dev/sda\n" && exit
 [[ ! -e $usb_device ]] && echo -e "\n$usb_device doesn't exist\n" && exit
 
 mkdir -p $mnt_usb $mkosi_rootfs
