@@ -125,7 +125,7 @@ install_usb() {
     sed -i "s/BOOT_UUID_PLACEHOLDER/$BOOT_UUID/" $mnt_usb/etc/fstab
     sed -i "s/ROOT_UUID_PLACEHOLDER/$ROOT_UUID/" $mnt_usb/etc/fstab
     echo '### Running systemd-machine-id-setup...'
-    # needed to generate a (temp) machine-id so a BLS entry can be created below
+    # generate a machine-id
     chroot $mnt_usb systemd-machine-id-setup
     chroot $mnt_usb echo "KERNEL_INSTALL_MACHINE_ID=$(cat /etc/machine-id)" > /etc/machine-info
     echo '### Updating GRUB...'
