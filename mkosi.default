@@ -1,0 +1,60 @@
+[Distribution]
+Distribution=fedora
+Release=36
+Architecture=aarch64
+UseHostRepositories=yes
+Repositories=fedora,updates,asahi-linux
+
+[Output]
+Format=directory
+Output=mkosi.rootfs
+Bootable=no
+Hostname=fedora
+
+[Content]
+Packages=
+    audit
+    bash-completion
+    btrfs-progs
+    cloud-utils-growpart
+    dhcp-client
+    diffutils
+    dosfstools
+    dnf
+    dnf-plugins-core
+    e2fsprogs
+    efivar
+    f2fs-tools
+    findutils
+    grub2-efi-aa64
+    grub2-efi-aa64-modules
+    grubby
+    hostname
+    iproute
+    iputils
+    iwd
+    kernel
+    kmod
+    linux-firmware
+    net-tools
+    man-db
+    man-pages
+    ncurses
+    openssh-clients
+    openssh-server
+    passwd
+    pciutils
+    rootfiles
+    rpm
+    rsync
+    sudo
+    symlinks
+    systemd-networkd
+    tar
+    usbutils
+    vim-minimal
+    vim-enhanced
+    wget
+
+[Validation]
+Password=fedora

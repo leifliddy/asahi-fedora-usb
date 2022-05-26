@@ -1,0 +1,44 @@
+#!/bin/bash
+
+# create initial grub2 config and bootloader
+
+BOOT_PART='/boot'
+GRUB_DIR='/boot/grub2'
+PREFIX_GRUB_DIR='/grub2'
+GRUB_CONFIG='/boot/grub2/grub.cfg'
+UBOOT_BOOTLOADER='/boot/efi/EFI/BOOT/BOOTAA64.EFI'
+GRUB_MODULES='ext2 part_gpt search btrfs f2fs'
+
+# this creates a uefi grub boot entry that doesn't work
+rm -f /etc/grub.d/30_uefi-firmware
+# copy grub modules /boot/grub2/arm64-efi
+cp -r /usr/lib/grub/arm64-efi $GRUB_DIR/arm64-efi/
+
+uuid=$(grub2-probe $BOOT_PART -t fs_uuid)
+
+if [ -z "$uuid" ]; then
+    echo "Error: Unable to determine root filesystem UUID"
+    exit 1
+fi
+
+echo "UUID: $uuid"
+
+cat > /tmp/grub-core.cfg <<EOF
+search.fs_uuid $uuid root
+set prefix=(\$root)$PREFIX_GRUB_DIR
+EOF
+
+echo 'Generating GRUB image...'
+grub2-mkimage \
+    --directory '/usr/lib/grub/arm64-efi' \
+    -c /tmp/grub-core.cfg \
+    --prefix $PREFIX_GRUB_DIR \
+    --output $GRUB_DIR/arm64-efi/core.efi \
+    --format arm64-efi \
+    --compression auto \
+    $GRUB_MODULES
+
+grub2-mkconfig -o $GRUB_CONFIG
+
+cp $GRUB_DIR/arm64-efi/core.efi $UBOOT_BOOTLOADER
+chmod 700 $UBOOT_BOOTLOADER
