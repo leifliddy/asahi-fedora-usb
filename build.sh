@@ -90,6 +90,7 @@ prepare_usb_device() {
     mkfs.vfat -F 32 -i $(echo $EFI_UUID | tr -d '-') "$usb_device"1 || mkfs.vfat -F 32 -i $(echo $EFI_UUID | tr -d '-') "$usb_device"p1
     mkfs.ext4 -U $BOOT_UUID -F "$usb_device"2 || mkfs.ext4 -U $BOOT_UUID -F "$usb_device"p2
     mkfs.ext4 -U $ROOT_UUID -F "$usb_device"3 || mkfs.ext4 -U $ROOT_UUID -F "$usb_device"p3
+    systemctl daemon-reload
 
     if [ $(blkid | egrep -i "$EFI_UUID|$BOOT_UUID|$ROOT_UUID" | wc -l) -ne 3 ]; then
         echo -e "\nthe partitions and/or filesystem were not created correctly on $usb_device\nexiting...\n"
