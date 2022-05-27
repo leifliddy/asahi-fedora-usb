@@ -13,7 +13,7 @@ Upon completion, you can mount and unmount the usb drive (which contains 3 parti
 ./build.sh umount
 ```
 
-To boot the usb drive on an M1 system, enter the following ```u-boot``` command and boot time:
+To boot the usb drive on an M1 system, enter the following ```u-boot``` command at boot time:
 ```
 run bootcmd_usb0
 ```
