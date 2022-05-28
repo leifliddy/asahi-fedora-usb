@@ -20,5 +20,5 @@ run bootcmd_usb0
 ```
 
 The usb drive is read/write and contains three partitions: ```efi, boot, and root``` (just like a normal system)  
-Also ```mkosi``` has cross-architecture support, so you build this on an x86_64 system no problem.  
+Also ```mkosi``` has cross-architecture support, so you could build this on an x86_64 system no problem.  
 \*\*I'll provide more in-depth documentation later...
