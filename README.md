@@ -1,5 +1,11 @@
 Creates a Fedora usb drive that will boot on Apple M1 systems.
 
+**Prerequisites:** Ensure the ```mkosi``` package is installed  
+```
+dnf install mksoi
+```
+\*\*in theory you should be able to build the usb drive on any Linux system that has ```mkosi``` installed including Arch, Debian...etc  
+
 To build a minimal Fedora image and install it to a usb drive, simply run:
 ```
 ./build.sh -d /dev/sda
