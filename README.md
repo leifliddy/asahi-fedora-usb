@@ -3,9 +3,9 @@ Creates a Fedora usb drive that will boot on Apple M1 systems.
 **Prerequisites:** Ensure ```mkosi``` and ```arch-install-scripts``` (needed for ```arch-chroot```) are installed  
 ```
 # Fedora
-dnf install mkosi arch-install-scripts qemu-user-static
+dnf install mkosi arch-install-scripts systemd-container qemu-user-static
 # Debian
-apt install mkosi arch-install-scripts
+apt install mkosi arch-install-scripts systemd-container
 # Arch
 pacman -S mkosi arch-install-scripts
 ```
