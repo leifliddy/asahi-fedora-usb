@@ -11,7 +11,7 @@ Output=mkosi.rootfs
 Bootable=no
 Hostname=fedora
 
-[Content]
+[Packages]
 Packages=
     audit
     bash-completion
