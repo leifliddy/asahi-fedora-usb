@@ -102,6 +102,7 @@ mkosi_create_rootfs() {
     mkosi clean
     rm -rf .mkosi-*
     wget https://leifliddy.com/asahi-linux/asahi-linux.repo -O mkosi.skeleton/etc/yum.repos.d/asahi-linux.repo
+    wget https://leifliddy.com/.vendorfw/all_firmware.tar.gz -O mkosi.skeleton/boot/efi/asahi/all_firmware.tar.gz
     wget https://leifliddy.com/.vendorfw/firmware.tar -O mkosi.skeleton/boot/efi/vendorfw/firmware.tar
     wget https://leifliddy.com/.vendorfw/manifest.txt -O mkosi.skeleton/boot/efi/vendorfw/manifest.txt
     mkosi
@@ -129,6 +130,7 @@ install_usb() {
     # generate a machine-id
     chroot $mnt_usb systemd-machine-id-setup
     chroot $mnt_usb echo "KERNEL_INSTALL_MACHINE_ID=$(cat /etc/machine-id)" > /etc/machine-info
+    # run update-m1n1 to ensure the /boot/dtb/apple/*.dtb files are used
     echo '### Updating GRUB...'
     arch-chroot $mnt_usb /image.creation/update-grub
     echo "### Creating BLS (/boot/loader/entries/) entry..."
@@ -137,10 +139,14 @@ install_usb() {
     chroot $mnt_usb /image.creation/setup-services
     echo "### Enabling system services..."
     chroot $mnt_usb systemctl enable iwd.service sshd.service systemd-networkd.service
+    echo "### Disabling systemd-firstboot..."
+    chroot $mnt_usb rm -f /usr/lib/systemd/system/sysinit.target.wants/systemd-firstboot.service
+    rm -f  $image_mnt/etc/machine-id
+    rm -rf $mnt_usb/image.creation
     # remove .gitignore file
+    rm -f $mnt_usb/boot/efi/asahi/.gitignore
     rm -f $mnt_usb/boot/efi/vendorfw/.gitignore
     find $mnt_usb/boot/efi/ -type f | xargs chmod 700
-    rm -rf $mnt_usb/image.creation
     echo '### Unmounting usb partitions...'
     umount $mnt_usb/boot/efi
     umount $mnt_usb/boot

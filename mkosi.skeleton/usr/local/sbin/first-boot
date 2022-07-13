@@ -1,7 +1,0 @@
-#!/bin/bash
-
-# uncomment to change to the machine-id of the system
-#systemd-machine-id-setup
-#echo "KERNEL_INSTALL_MACHINE_ID=$(cat /etc/machine-id)" > /etc/machine-info
-#/usr/local/sbin/create.bls.entry.first.boot
-#/usr/local/sbin/update-grub

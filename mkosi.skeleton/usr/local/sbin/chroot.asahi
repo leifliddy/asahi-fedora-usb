@@ -1,0 +1,7 @@
+ #!/bin/bash
+
+[[ -z "$(findmnt -n /mnt)" ]] && mount /dev/nvme0n1p5 -o subvol=root /mnt
+[[ -z "$(findmnt -n /mnt/boot)" ]] && mount /dev/nvme0n1p5 -o subvol=boot /mnt/boot
+[[ -z "$(findmnt -n /mnt/boot/efi)" ]] && mount /dev/nvme0n1p4 -o /mnt/boot/efi
+
+arch-chroot /mnt

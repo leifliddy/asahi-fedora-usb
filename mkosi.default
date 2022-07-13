@@ -14,6 +14,8 @@ Hostname=fedora
 [Content]
 WithDocs=True
 Packages=
+    asahi-fwextract
+    asahi-scripts
     arch-install-scripts
     audit
     bash-completion
@@ -50,7 +52,6 @@ Packages=
     rpm
     rsync
     sudo
-    symlinks
     systemd-networkd
     tar
     usbutils
