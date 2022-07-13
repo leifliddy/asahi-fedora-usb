@@ -141,7 +141,7 @@ install_usb() {
     chroot $mnt_usb systemctl enable iwd.service sshd.service systemd-networkd.service
     echo "### Disabling systemd-firstboot..."
     chroot $mnt_usb rm -f /usr/lib/systemd/system/sysinit.target.wants/systemd-firstboot.service
-    rm -f  $image_mnt/etc/machine-id
+    rm -f  $mnt_usb/etc/machine-id
     rm -rf $mnt_usb/image.creation
     # remove .gitignore file
     rm -f $mnt_usb/boot/efi/asahi/.gitignore
