@@ -19,6 +19,7 @@ Packages=
     arch-install-scripts
     audit
     bash-completion
+    binutils
     btrfs-progs
     cloud-utils-growpart
     dhcp-client
