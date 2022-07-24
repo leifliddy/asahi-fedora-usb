@@ -15,7 +15,7 @@ cp -r /usr/lib/grub/arm64-efi $GRUB_DIR/arm64-efi/
 
 uuid=$(grub2-probe $BOOT_PART -t fs_uuid)
 
-if [ -z "$uuid" ]; then
+if [ -z $uuid ]; then
     echo "Error: Unable to determine root filesystem UUID"
     exit 1
 fi
