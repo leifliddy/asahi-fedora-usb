@@ -134,8 +134,6 @@ install_usb() {
     arch-chroot $mnt_usb /image.creation/update-grub
     echo "### Creating BLS (/boot/loader/entries/) entry..."
     chroot $mnt_usb /image.creation/create.bls.entry
-    echo "### Configuring system services..."
-    chroot $mnt_usb /image.creation/setup-services
     echo "### Enabling system services..."
     chroot $mnt_usb systemctl enable iwd.service sshd.service systemd-networkd.service
     echo "### Disabling systemd-firstboot..."
