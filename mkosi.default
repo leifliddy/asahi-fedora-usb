@@ -29,7 +29,6 @@ Packages=
     dnf-plugins-core
     e2fsprogs
     efivar
-    f2fs-tools
     findutils
     grub2-efi-aa64
     grub2-efi-aa64-modules
