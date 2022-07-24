@@ -23,7 +23,7 @@ fi
 boot_dev_path=$(blkid -U $uuid)
 boot_fstype=$(blkid -s TYPE -o value $boot_dev_path)
 
-# a boot btrfs subvolume requires a preceeding /boot
+# a boot btrfs subvolume requires a preceding /boot
 if [ $boot_fstype == 'btrfs' ]; then
     PREFIX_GRUB_DIR=$GRUB_DIR
 else
