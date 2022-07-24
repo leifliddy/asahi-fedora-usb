@@ -130,7 +130,6 @@ install_usb() {
     # generate a machine-id
     chroot $mnt_usb systemd-machine-id-setup
     chroot $mnt_usb echo "KERNEL_INSTALL_MACHINE_ID=$(cat /etc/machine-id)" > /etc/machine-info
-    # run update-m1n1 to ensure the /boot/dtb/apple/*.dtb files are used
     echo '### Updating GRUB...'
     arch-chroot $mnt_usb /image.creation/update-grub
     echo "### Creating BLS (/boot/loader/entries/) entry..."
