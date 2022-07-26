@@ -131,7 +131,7 @@ install_usb() {
     chroot $mnt_usb systemd-machine-id-setup
     chroot $mnt_usb echo "KERNEL_INSTALL_MACHINE_ID=$(cat /etc/machine-id)" > /etc/machine-info
     echo '### Updating GRUB...'
-    arch-chroot $mnt_usb /image.creation/update-grub
+    arch-chroot $mnt_usb /usr/sbin/update-grub
     echo "### Creating BLS (/boot/loader/entries/) entry..."
     chroot $mnt_usb /image.creation/create.bls.entry
     echo "### Enabling system services..."
