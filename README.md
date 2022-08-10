@@ -1,4 +1,4 @@
-Creates a Fedora usb drive that will boot on Apple M1 systems.
+Creates a Fedora usb drive that will boot on Apple M1/M2 systems.
 
 **Prerequisites:** Ensure ```mkosi``` and ```arch-install-scripts``` (needed for ```arch-chroot```) are installed  
 ```
