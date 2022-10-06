@@ -140,6 +140,7 @@ install_usb() {
     chroot $mnt_usb rm -f /usr/lib/systemd/system/sysinit.target.wants/systemd-firstboot.service
     rm -f  $mnt_usb/etc/machine-id
     rm -rf $mnt_usb/image.creation
+    rm -f  $mnt_usb/etc/dracut.conf.d/initial-boot.conf
     # remove .gitignore file
     rm -f $mnt_usb/boot/efi/asahi/.gitignore
     rm -f $mnt_usb/boot/efi/vendorfw/.gitignore
