@@ -13,7 +13,7 @@ Note: ```qemu-user-static``` is only needed if not building on an ```aarch64``` 
 
 In theory you should be able to build this Fedora usb drive on any Linux system that has ```mkosi``` and ```arch-install-scripts``` installed  
 Note: I've only built this on a Fedora system, so YMMV on other distros.  
-If you try to build this an Arch or Debian system, please let me know if it works for you.  
+If you try to build this on an Arch or Debian system, please let me know if it works for you.  
 
 To build a minimal Fedora image and install it to a usb drive, simply run:
 ```
