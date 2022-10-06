@@ -9,6 +9,8 @@ apt install mkosi arch-install-scripts gdisk systemd-container
 # Arch
 pacman -S mkosi arch-install-scripts gdisk
 ```
+Note: ```qemu-user-static``` is only needed if not building on an ```aarch64``` system. 
+
 In theory you should be able to build this Fedora usb drive on any Linux system that has ```mkosi``` and ```arch-install-scripts``` installed  
 Note: I've only built this on a Fedora system, so YMMV on other distros.  
 If you try to build this an Arch or Debian system, please let me know if it works for you.  
@@ -34,7 +36,6 @@ run bootcmd_usb0
 
 The usb drive is read/write and contains three partitions: ```efi, boot, and root``` (just like a normal system)  
 
-Also ```dnf``` has cross-architecture support, so you could build this on an x86_64 Fedora system no problem.  
-\*\*just ensure ```qemu-user-static``` is installed.   
+Also ```dnf``` has cross-architecture support, so you could build this on an x86_64 Fedora system no problem.   
 I don't believe other package managers (```apt``` or ```pacman```) support this feature.  
 https://github.com/systemd/mkosi/issues/138
