@@ -24,10 +24,11 @@ fi
 
 
 # specify the usb device with the -d argument
-while getopts d: arg
+while getopts d:w arg
 do
     case "${arg}" in
         d) usb_device=${OPTARG};;
+        w) wipe=true ;;
     esac
 done
 
@@ -36,6 +37,7 @@ mount_usb() {
     # mounts an existing usb drive to mnt_usb/ so you can inspect the contents or chroot into it...etc
     echo '### Mounting usb partitions...'
     systemctl daemon-reload
+    sleep 1
     # first try to mount the usb partitions via their uuid
     if [ $(blkid | egrep -i "$EFI_UUID|$BOOT_UUID|$ROOT_UUID" | wc -l) -eq 3 ]; then
         [[ -z "$(findmnt -n $mnt_usb)" ]] && mount -U $ROOT_UUID $mnt_usb
@@ -67,6 +69,31 @@ umount_usb() {
     [[ "$(findmnt -n $mnt_usb)" ]] && umount $mnt_usb
 }
 
+wipe_usb() {
+    # wipe the contents of the usb drive to avoid having to repartition it
+
+    # first check if the paritions exist
+    if [ $(blkid | egrep -i "$EFI_UUID|$BOOT_UUID|$ROOT_UUID" | wc -l) -eq 3 ]; then
+        [[ -z "$(findmnt -n $mnt_usb)" ]] && mount -U $ROOT_UUID $mnt_usb
+        if [ -e $mnt_usb/boot ]; then
+            [[ -z "$(findmnt -n $mnt_usb/boot)" ]] && mount -U $BOOT_UUID $mnt_usb/boot
+        fi
+        if [ -e $mnt_usb/boot/efi ]; then
+            [[ -z "$(findmnt -n $mnt_usb/boot/efi)" ]] && mount -U $EFI_UUID $mnt_usb/boot/efi
+        fi
+    fi
+
+    if [ ! "$(findmnt -n $mnt_usb)" ]; then
+        echo -e '### The usb drive did not mount\nparitioning disk...\n'
+        wipe=false
+        return
+    fi
+
+    echo '### Wiping usb partitions...'
+    [[ "$(findmnt -n $mnt_usb/boot/efi)" ]] && rm -rf $mnt_usb/boot/efi/* && umount $mnt_usb/boot/efi
+    [[ "$(findmnt -n $mnt_usb/boot)" ]] &&  rm -rf $mnt_usb/boot/* && umount $mnt_usb/boot
+    [[ "$(findmnt -n $mnt_usb)" ]] && rm -rf $mnt_usb/* && umount $mnt_usb
+}
 
 # ./build.sh mount
 #  or
@@ -109,7 +136,6 @@ mkosi_create_rootfs() {
     mkosi clean
     rm -rf .mkosi-*
     wget https://leifliddy.com/asahi-linux/asahi-linux.repo -O mkosi.skeleton/etc/yum.repos.d/asahi-linux.repo
-    wget https://leifliddy.com/.vendorfw/all_firmware.tar.gz -O mkosi.skeleton/boot/efi/asahi/all_firmware.tar.gz
     mkosi
 }
 
@@ -146,9 +172,6 @@ install_usb() {
     rm -f  $mnt_usb/etc/machine-id
     rm -rf $mnt_usb/image.creation
     rm -f  $mnt_usb/etc/dracut.conf.d/initial-boot.conf
-    # remove .gitignore file
-    rm -f $mnt_usb/boot/efi/asahi/.gitignore
-    rm -f $mnt_usb/boot/efi/vendorfw/.gitignore
     find $mnt_usb/boot/efi/ -type f | xargs chmod 700
     echo '### Unmounting usb partitions...'
     umount $mnt_usb/boot/efi
@@ -157,6 +180,12 @@ install_usb() {
     echo '### Done'
 }
 
-prepare_usb_device
+# if -w argument is specified
+# ie
+# ./build.sh -wd /dev/sda
+# and the disk partitions already exist (from a previous install)
+# then remove the files from disk vs repartitioning it
+# warning: this feature is experimental
+[[ $wipe = true ]] && wipe_usb || prepare_usb_device
 mkosi_create_rootfs
 install_usb
