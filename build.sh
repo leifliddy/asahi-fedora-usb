@@ -56,7 +56,6 @@ mount_usb() {
 
 umount_usb() {
     # unmounts usb drive from mnt_usb/
-    # unmounts usb drive from mnt_usb/
     echo '### Checking to see if usb drive is mounted'
     if [ ! "$(findmnt -n $mnt_usb)" ]; then
         return
