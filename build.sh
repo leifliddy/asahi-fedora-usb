@@ -105,8 +105,6 @@ mkosi_create_rootfs() {
     rm -rf .mkosi-*
     wget https://leifliddy.com/asahi-linux/asahi-linux.repo -O mkosi.skeleton/etc/yum.repos.d/asahi-linux.repo
     wget https://leifliddy.com/.vendorfw/all_firmware.tar.gz -O mkosi.skeleton/boot/efi/asahi/all_firmware.tar.gz
-    wget https://leifliddy.com/.vendorfw/firmware.tar -O mkosi.skeleton/boot/efi/vendorfw/firmware.tar
-    wget https://leifliddy.com/.vendorfw/manifest.txt -O mkosi.skeleton/boot/efi/vendorfw/manifest.txt
     mkosi
 }
 
