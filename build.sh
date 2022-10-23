@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 # perhaps we should mandate the user specify the device
 #usb_device='/dev/sda'
 mkosi_rootfs='mkosi.rootfs'
@@ -92,7 +94,7 @@ prepare_usb_device() {
     mkfs.ext4 -O '^metadata_csum' -U $ROOT_UUID -L 'fedora-usb-root' -F "$usb_device"3 || mkfs.ext4 -O '^metadata_csum' -U $ROOT_UUID -L 'fedora-usb-root' -F "$usb_device"p3
     systemctl daemon-reload
 
-    if [ $(blkid | egrep -i "$EFI_UUID|$BOOT_UUID|$ROOT_UUID" | wc -l) -ne 3 ]; then
+    if [ $(blkid | grep -Ei "$EFI_UUID|$BOOT_UUID|$ROOT_UUID" | wc -l) -ne 3 ]; then
         echo -e "\nthe partitions and/or filesystem were not created correctly on $usb_device\nexiting...\n"
         exit
     fi
