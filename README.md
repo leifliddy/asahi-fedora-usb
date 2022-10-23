@@ -22,7 +22,7 @@ To build a minimal Fedora image and install it to a usb drive, simply run:
 
 **note:** substitute ```/dev/sda``` with the device id of your usb drive
 
-If you've previously installed this Fedora image to the usb drive, you can re-install the image without having to repartition/reformat the drive by providing the `-w` argument   
+If you've previously installed this Fedora image to the usb drive, you can wipe the drive and install a new image without having to repartition/reformat the drive by providing the `-w` argument   
 ```
 ./build.sh -wd /dev/sda
 ```
