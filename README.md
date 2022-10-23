@@ -3,7 +3,7 @@ Creates a Fedora usb drive that will boot on Apple M1/M2 systems.
 **Package install:**  
 ```
 # Fedora
-dnf install mkosi arch-install-scripts systemd-container gdisk qemu-user-static
+dnf install mkosi arch-install-scripts systemd-container gdisk rsync qemu-user-static
 # Debian
 apt install mkosi arch-install-scripts gdisk systemd-container
 # Arch
