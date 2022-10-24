@@ -32,7 +32,7 @@ Once the drive is created, you can locally mount and unmount the usb drive (whic
 ./build.sh mount
 ./build.sh umount
 ```
-\*\*mounting the usb drive is useful for inspecting the contents of the drive or making changes to it   
+**note:** mounting the usb drive is useful for inspecting the contents of the drive or making changes to it   
 
 To boot the usb drive on an M1 system, enter the following ```u-boot``` command at boot time:
 ```
