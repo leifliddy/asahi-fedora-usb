@@ -5,7 +5,7 @@ Creates a Fedora usb drive that will boot on Apple M1/M2 systems.
 # Fedora
 dnf install mkosi arch-install-scripts systemd-container gdisk rsync qemu-user-static
 ```
-**note:** ```qemu-user-static``` is only needed if not building on an ```aarch64``` system. 
+**note:** ```qemu-user-static``` is only needed if building on a non-```aarch64``` system. 
 
 To build a minimal Fedora image and install it to a usb drive, simply run:
 ```
