@@ -1,8 +1,8 @@
 Creates a Fedora usb drive that will boot on Apple M1/M2 systems.   
 
-**note**: There's currenlty an issue creating a Fedora37 drive with `mkosi`  
+**note**: There's currently an issue creating a Fedora37 drive with `mkosi`  
 I needed to set this in `/usr/lib/python3.10/site-packages/mkosi/__init__.py`  
-I'll find out the proper solution soon.  
+I'll try and find the proper solution. https://github.com/systemd/mkosi/issues/1263  
 ```diff
 @@ -1988,7 +1988,7 @@ def invoke_dnf(state: MkosiState, comman
      cmdline += [command, *sort_packages(packages)]
