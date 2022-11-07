@@ -52,6 +52,7 @@ Packages=
     rootfiles
     rpm
     rsync
+    selinux-policy
     sudo
     systemd-networkd
     tar
