@@ -1,6 +1,6 @@
 [Distribution]
 Distribution=fedora
-Release=36
+Release=37
 Architecture=aarch64
 UseHostRepositories=yes
 Repositories=fedora,updates,asahi-linux
@@ -15,7 +15,7 @@ Hostname=fedora
 WithDocs=True
 Packages=
     alsa-ucm-asahi
-    asahi-fwextract
+    asahi-firstboot
     asahi-scripts
     arch-install-scripts
     audit
@@ -26,6 +26,7 @@ Packages=
     dhcp-client
     diffutils
     dosfstools
+    dracut-asahi
     dnf
     dnf-plugins-core
     e2fsprogs
