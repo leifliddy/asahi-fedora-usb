@@ -174,7 +174,7 @@ install_usb() {
     rm -f  $mnt_usb/etc/dracut.conf.d/initial-boot.conf
     find $mnt_usb/boot/efi/ -type f | xargs chmod 700
     echo "### Setting selinux to permissive"
-    sed -i 's/^SELINUX=.*$/SELINUX=permissive/' $image_mnt/etc/selinux/config    
+    sed -i 's/^SELINUX=.*$/SELINUX=permissive/' $mnt_usb/etc/selinux/config    
     echo '### Unmounting usb partitions...'
     umount $mnt_usb/boot/efi
     umount $mnt_usb/boot
