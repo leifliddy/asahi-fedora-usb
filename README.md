@@ -1,4 +1,19 @@
-Creates a Fedora usb drive that will boot on Apple M1/M2 systems.
+Creates a Fedora usb drive that will boot on Apple M1/M2 systems.   
+
+**note**: There's currenlty an issue creating a Fedora37 drive with `mkosi`  
+I needed to set this in `/usr/lib/python3.10/site-packages/mkosi/__init__.py`  
+I'll find out the proper solution soon.  
+```diff
+@@ -1988,7 +1988,7 @@ def invoke_dnf(state: MkosiState, comman
+     cmdline += [command, *sort_packages(packages)]
+ 
+     with mount_api_vfs(state.root):
+-        run(cmdline, env=dict(KERNEL_INSTALL_BYPASS="1"))
++        run(cmdline, env=dict(KERNEL_INSTALL_BYPASS="0"))
+ 
+     distribution, _ = detect_distribution()
+     if distribution not in (Distribution.debian, Distribution.ubuntu):
+```
 
 **Fedora package install:**  
 ```
