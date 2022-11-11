@@ -3,19 +3,25 @@ Distribution=fedora
 Release=37
 Architecture=aarch64
 UseHostRepositories=yes
-Repositories=fedora,updates,asahi-linux
+Repositories=fedora,asahi-linux
+#Repositories=fedora,updates,asahi-linux
 
 [Output]
-Format=directory
-Output=mkosi.rootfs
-Bootable=no
+Format=gpt_ext4
+Bootable=yes
+#Output=mkosi.rootfs
+ImageId=fedora
 Hostname=fedora
+KernelCommandLine=!* root=UUID=d747cb2a-aff1-4e47-8a33-c4d9b7475df9
+MachineID=46d1386bbc7c40baacedc67d2cbab734
+
+[Partitions]
+RootSize=1.2G
 
 [Content]
 WithDocs=True
 Packages=
     alsa-ucm-asahi
-    asahi-firstboot
     asahi-scripts
     arch-install-scripts
     audit
@@ -32,9 +38,6 @@ Packages=
     e2fsprogs
     efivar
     findutils
-    grub2-efi-aa64
-    grub2-efi-aa64-modules
-    grubby
     hostname
     iproute
     iputils

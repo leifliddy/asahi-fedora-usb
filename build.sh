@@ -2,19 +2,12 @@
 
 set -e
 
-# perhaps we should mandate the user specify the device
-#usb_device='/dev/sda'
-mkosi_rootfs='mkosi.rootfs'
+img_name='fedora.raw'
+mnt_img='image_mnt'
 mnt_usb='mnt_usb'
 
 EFI_UUID='3051-D434'
-BOOT_UUID='a1492762-3fe2-4908-a8b9-118439becd26'
 ROOT_UUID='d747cb2a-aff1-4e47-8a33-c4d9b7475df9'
-
-# uncomment to randomize the UUID's
-#EFI_UUID=$(uuidgen | tr '[a-z]' '[A-Z]' | cut -c1-8 | fold -w4 | paste -sd '-')
-#BOOT_UUID=$(uuidgen)
-#ROOT_UUID=$(uuidgen)
 
 
 if [ "$(whoami)" != 'root' ]; then
@@ -32,17 +25,48 @@ do
     esac
 done
 
+get_loop_dev() {
+    loop_dev=$(losetup -l | grep $img_name | grep -v '(deleted)' | awk '{print $1}')
+}
+
+mount_image() {
+    echo '### Mounting raw image...'
+    get_loop_dev
+    [[ -z $loop_dev ]] && losetup -f -P $img_name && get_loop_dev && sleep 1
+
+    esp_part=${loop_dev}p1
+    root_part=${loop_dev}p2
+
+    [[ -z "$(findmnt -n $mnt_img)" ]] && mount $root_part $mnt_img
+    [[ -z "$(findmnt -n $mnt_img/efi)" ]] && mount $esp_part $mnt_img/efi
+
+    sleep 1
+}
+
+umount_image() {
+    # unmounts image from image_mnt
+    loop_dev=$(losetup -l | grep $img_name | awk '{print $1}')
+
+    if [ ! "$(findmnt -n $mnt_img)" ]; then
+        return
+    fi
+    echo '### Unmounting raw image...'
+    [[ "$(findmnt -n $mnt_img/efi)" ]] && umount $mnt_img/efi
+    [[ "$(findmnt -n $mnt_img)" ]] && umount $mnt_img
+
+    [[ -n $loop_dev ]] && losetup -d $loop_dev
+}
 
 mount_usb() {
     # mounts an existing usb drive to mnt_usb/ so you can inspect the contents or chroot into it...etc
     echo '### Mounting usb partitions...'
-    systemctl daemon-reload
+    #systemctl daemon-reload
     sleep 1
     # first try to mount the usb partitions via their uuid
-    if [ $(blkid | egrep -i "$EFI_UUID|$BOOT_UUID|$ROOT_UUID" | wc -l) -eq 3 ]; then
+    if [ $(blkid | egrep -i "$EFI_UUID|$ROOT_UUID" | wc -l) -eq 2 ]; then
         [[ -z "$(findmnt -n $mnt_usb)" ]] && mount -U $ROOT_UUID $mnt_usb
-        [[ -z "$(findmnt -n $mnt_usb/boot)" ]] && mount -U $BOOT_UUID $mnt_usb/boot
-        [[ -z "$(findmnt -n $mnt_usb/boot/efi)" ]] && mount -U $EFI_UUID $mnt_usb/boot/efi
+        mkdir -p $mnt_usb/efi
+        [[ -z "$(findmnt -n $mnt_usb/efi)" ]] && mount -U $EFI_UUID $mnt_usb/efi
     else
         # otherwise mount via the device id
         if [ -z $usb_device ]; then
@@ -50,22 +74,22 @@ mount_usb() {
             echo -e "\ntherefore you must specify the usb device ie\n./build.sh -d /dev/sda mount\n"
             exit
         fi
-        [[ -z "$(findmnt -n $mnt_usb)" ]] && mount "$usb_device"3 $mnt_usb
-        [[ -z "$(findmnt -n $mnt_usb/boot)" ]] && mount "$usb_device"2 $mnt_usb/boot
-        [[ -z "$(findmnt -n $mnt_usb/boot/efi)" ]] && mount "$usb_device"1 $mnt_usb/boot/efi
+        [[ -z "$(findmnt -n $mnt_usb)" ]] && mount ${usb_device}2 $mnt_usb
+        mkdir -p $mnt_usb/efi
+        [[ -z "$(findmnt -n $mnt_usb/efi)" ]] && mount ${usb_device}1 $mnt_usb/efi
     fi
+
+    sleep 1
 }
 
 umount_usb() {
     # unmounts usb drive from mnt_usb/
-    echo '### Checking to see if usb drive is mounted'
     if [ ! "$(findmnt -n $mnt_usb)" ]; then
         return
     fi
 
     echo '### Unmounting usb partitions...'
-    [[ "$(findmnt -n $mnt_usb/boot/efi)" ]] && umount $mnt_usb/boot/efi
-    [[ "$(findmnt -n $mnt_usb/boot)" ]] && umount $mnt_usb/boot
+    [[ "$(findmnt -n $mnt_usb/efi)" ]] && umount $mnt_usb/efi
     [[ "$(findmnt -n $mnt_usb)" ]] && umount $mnt_usb
 }
 
@@ -73,13 +97,10 @@ wipe_usb() {
     # wipe the contents of the usb drive to avoid having to repartition it
 
     # first check if the paritions exist
-    if [ $(blkid | egrep -i "$EFI_UUID|$BOOT_UUID|$ROOT_UUID" | wc -l) -eq 3 ]; then
+    if [ $(blkid | egrep -i "$EFI_UUID|$ROOT_UUID" | wc -l) -eq 2 ]; then
         [[ -z "$(findmnt -n $mnt_usb)" ]] && mount -U $ROOT_UUID $mnt_usb
-        if [ -e $mnt_usb/boot ]; then
-            [[ -z "$(findmnt -n $mnt_usb/boot)" ]] && mount -U $BOOT_UUID $mnt_usb/boot
-        fi
-        if [ -e $mnt_usb/boot/efi ]; then
-            [[ -z "$(findmnt -n $mnt_usb/boot/efi)" ]] && mount -U $EFI_UUID $mnt_usb/boot/efi
+        if [ -e $mnt_usb/efi ]; then
+            [[ -z "$(findmnt -n $mnt_usb/efi)" ]] && mount -U $EFI_UUID $mnt_usb/efi
         fi
     fi
 
@@ -90,8 +111,7 @@ wipe_usb() {
     fi
 
     echo '### Wiping usb partitions...'
-    [[ "$(findmnt -n $mnt_usb/boot/efi)" ]] && rm -rf $mnt_usb/boot/efi/* && umount $mnt_usb/boot/efi
-    [[ "$(findmnt -n $mnt_usb/boot)" ]] &&  rm -rf $mnt_usb/boot/* && umount $mnt_usb/boot
+    [[ "$(findmnt -n $mnt_usb/efi)" ]] && rm -rf $mnt_usb/efi/* && umount $mnt_usb/efi
     [[ "$(findmnt -n $mnt_usb)" ]] && rm -rf $mnt_usb/* && umount $mnt_usb
 }
 
@@ -105,13 +125,18 @@ if [[ $1 == 'mount' ]]; then
 elif [[ $1 == 'umount' ]] || [[ $1 == 'unmount' ]]; then
     umount_usb
     exit
+elif [[ $1 == 'image' ]]; then
+    mount_image
+    exit
+elif [[ $1 == 'uimage' ]] || [[ $1 == 'imageu' ]]; then
+    umount_image
+    exit
 fi
-
 
 [[ -z $usb_device ]] && echo -e "\nyou must specify a usb device ie\n./build.sh -d /dev/sda\n" && exit
 [[ ! -e $usb_device ]] && echo -e "\n$usb_device doesn't exist\n" && exit
 
-mkdir -p $mnt_usb $mkosi_rootfs
+mkdir -p $mnt_img $mnt_usb
 
 
 prepare_usb_device() {
@@ -120,19 +145,19 @@ prepare_usb_device() {
     # create 5GB root partition
     #echo -e 'o\ny\nn\n\n\n+600M\nef00\nn\n\n\n+1G\n8300\nn\n\n\n+5G\n8300\nw\ny\n' | gdisk "$usb_device"
     # root parition will take up all remaining space
-    echo -e 'o\ny\nn\n\n\n+600M\nef00\nn\n\n\n+1G\n8300\nn\n\n\n\n8300\nw\ny\n' | gdisk "$usb_device"
-    mkfs.vfat -F 32 -n 'EFI-USB-FED' -i $(echo $EFI_UUID | tr -d '-') "$usb_device"1 || mkfs.vfat -F 32 -n 'EFI-USB-FED' -i $(echo $EFI_UUID | tr -d '-') "$usb_device"p1
-    mkfs.ext4 -O '^metadata_csum' -U $BOOT_UUID -L 'fedora-usb-boot' -F "$usb_device"2 || mkfs.ext4 -O '^metadata_csum' -U $BOOT_UUID -L 'fedora-usb-boot' -F "$usb_device"p2
-    mkfs.ext4 -O '^metadata_csum' -U $ROOT_UUID -L 'fedora-usb-root' -F "$usb_device"3 || mkfs.ext4 -O '^metadata_csum' -U $ROOT_UUID -L 'fedora-usb-root' -F "$usb_device"p3
+    echo -e 'o\ny\nn\n\n\n+2G\nef00\nn\n\n\n\n8300\nw\ny\n' | gdisk $usb_device
+    mkfs.vfat -F 32 -n 'EFI-USB-FED' -i $(echo $EFI_UUID | tr -d '-') ${usb_device}1 || mkfs.vfat -F 32 -n 'EFI-USB-FED' -i $(echo $EFI_UUID | tr -d '-') ${usb_device}p1
+    mkfs.ext4 -O '^metadata_csum' -U $ROOT_UUID -L 'fedora-usb-root' -F ${usb_device}2 || mkfs.ext4 -O '^metadata_csum' -U $ROOT_UUID -L 'fedora-usb-root' -F ${usb_device}p2
     systemctl daemon-reload
 
-    if [ $(blkid | grep -Ei "$EFI_UUID|$BOOT_UUID|$ROOT_UUID" | wc -l) -ne 3 ]; then
+    if [ $(blkid | grep -Ei "$EFI_UUID|$ROOT_UUID" | wc -l) -ne 2 ]; then
         echo -e "\nthe partitions and/or filesystem were not created correctly on $usb_device\nexiting...\n"
         exit
     fi
 }
 
-mkosi_create_rootfs() {
+mkosi_create_image() {
+    umount_image
     mkosi clean
     rm -rf .mkosi-*
     wget https://leifliddy.com/asahi-linux/asahi-linux.repo -O mkosi.skeleton/etc/yum.repos.d/asahi-linux.repo
@@ -140,44 +165,29 @@ mkosi_create_rootfs() {
 }
 
 install_usb() {
-    # if  $mnt_usb is mounted, then unmount it
-    [[ "$(findmnt -n $mnt_usb/boot/efi)" ]] && umount $mnt_usb/boot/efi
-    [[ "$(findmnt -n $mnt_usb/boot)" ]] && umount $mnt_usb/boot
-    [[ "$(findmnt -n $mnt_usb)" ]] && umount $mnt_usb
-    echo '### Cleaning up...'
-    rm -f $mkosi_rootfs/var/cache/dnf/*
-    echo '### Mounting usb partitions and copying files...'
-    mount -U $ROOT_UUID $mnt_usb
-    rsync -aHAX --delete --exclude '/tmp/*' --exclude '/boot/*' $mkosi_rootfs/ $mnt_usb
-    mount -U $BOOT_UUID $mnt_usb/boot
-    rsync -aHAX --delete $mkosi_rootfs/boot/ --exclude '/efi/*' $mnt_usb/boot
-    mount -U $EFI_UUID $mnt_usb/boot/efi
-    rsync -aHA --delete $mkosi_rootfs/boot/efi/ $mnt_usb/boot/efi
+    # ensure image is mounted
+    mount_image
+    # ensure usb drive is not mounted
+    mount_usb
+    echo '### Rsyncing files...'
+    rsync -aHAX --delete --exclude={"/dev/*","/proc/*","/sys/*","/lost+found/","/efi/*"} $mnt_img/ $mnt_usb
+    rsync -aHA  --delete $mnt_img/efi/ $mnt_usb/efi
+    umount_image
     echo '### Setting uuids for partitions in /etc/fstab...'
     sed -i "s/EFI_UUID_PLACEHOLDER/$EFI_UUID/" $mnt_usb/etc/fstab
-    sed -i "s/BOOT_UUID_PLACEHOLDER/$BOOT_UUID/" $mnt_usb/etc/fstab
     sed -i "s/ROOT_UUID_PLACEHOLDER/$ROOT_UUID/" $mnt_usb/etc/fstab
-    echo '### Running systemd-machine-id-setup...'
-    # generate a machine-id
-    chroot $mnt_usb systemd-machine-id-setup
-    chroot $mnt_usb echo "KERNEL_INSTALL_MACHINE_ID=$(cat /etc/machine-id)" > /etc/machine-info
-    echo '### Updating GRUB...'
-    arch-chroot $mnt_usb /usr/sbin/update-grub
-    echo "### Creating BLS (/boot/loader/entries/) entry..."
-    chroot $mnt_usb /image.creation/create.bls.entry
+    echo "### Setting systemd-boot timeout value..."
+    sed -i 's/#timeout.*$/timeout 5/' $mnt_usb/efi/loader/loader.conf
     echo "### Enabling system services..."
     chroot $mnt_usb systemctl enable iwd.service sshd.service systemd-networkd.service
-    echo "### Disabling systemd-firstboot..."
-    chroot $mnt_usb rm -f /usr/lib/systemd/system/sysinit.target.wants/systemd-firstboot.service
-    rm -f  $mnt_usb/etc/machine-id
-    rm -rf $mnt_usb/image.creation
-    rm -f  $mnt_usb/etc/dracut.conf.d/initial-boot.conf
-    find $mnt_usb/boot/efi/ -type f | xargs chmod 700
+    echo "### Remove unneeded efi image..."
+    rm -f $mnt_usb/efi/EFI/Linux/*.efi
+    # selinux enforcing mode still needs to be fully tested out
+    # probably a good idea to run restorecon -Rv / after the first boot
     echo "### Setting selinux to permissive"
     sed -i 's/^SELINUX=.*$/SELINUX=permissive/' $mnt_usb/etc/selinux/config
     echo '### Unmounting usb partitions...'
-    umount $mnt_usb/boot/efi
-    umount $mnt_usb/boot
+    umount $mnt_usb/efi
     umount $mnt_usb
     echo '### Done'
 }
@@ -189,5 +199,5 @@ install_usb() {
 # then remove the files from disk vs repartitioning it
 # warning: this feature is experimental
 [[ $wipe = true ]] && wipe_usb || prepare_usb_device
-mkosi_create_rootfs
+mkosi_create_image
 install_usb

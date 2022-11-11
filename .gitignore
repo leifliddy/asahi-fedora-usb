@@ -1,9 +1,8 @@
-images
-mkosi.rootfs
-mkosi.rootfs.manifest
 .mkosi-*
 mnt_usb
 asahi-linux.repo
-firmware.tar
-manifest.txt
-all_firmware.tar.gz
+fedora.cmdline
+fedora.initrd
+fedora.raw
+fedora.raw.manifest
+fedora.vmlinuz
