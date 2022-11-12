@@ -186,9 +186,7 @@ install_usb() {
     # probably a good idea to run restorecon -Rv / after the first boot
     echo "### Setting selinux to permissive"
     sed -i 's/^SELINUX=.*$/SELINUX=permissive/' $mnt_usb/etc/selinux/config
-    echo '### Unmounting usb partitions...'
-    umount $mnt_usb/efi
-    umount $mnt_usb
+    umount_usb
     echo '### Done'
 }
 
