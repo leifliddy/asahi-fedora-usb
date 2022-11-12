@@ -29,5 +29,3 @@ To boot the usb drive on an M1 system, enter the following ```u-boot``` command 
 ```
 run bootcmd_usb0
 ```
-
-The usb drive is read/write and contains three partitions: ```efi, boot, and root``` (just like a normal system)
