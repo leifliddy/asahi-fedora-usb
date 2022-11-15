@@ -3,9 +3,7 @@ Distribution=fedora
 Release=37
 Architecture=aarch64
 UseHostRepositories=yes
-Repositories=fedora,asahi-linux
-# enable the updates repo once F37 is offically released
-#Repositories=fedora,updates,asahi-linux
+Repositories=fedora,updates,asahi-linux
 
 [Output]
 Format=gpt_ext4
