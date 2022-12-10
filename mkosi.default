@@ -42,6 +42,7 @@ Packages=
     iwd
     kernel
     kmod
+    light
     linux-firmware
     net-tools
     man-db
