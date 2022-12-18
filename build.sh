@@ -178,8 +178,12 @@ install_usb() {
     sed -i "s/ROOT_UUID_PLACEHOLDER/$ROOT_UUID/" $mnt_usb/etc/fstab
     echo "### Setting systemd-boot timeout value..."
     sed -i 's/#timeout.*$/timeout 5/' $mnt_usb/efi/loader/loader.conf
+    # adding a small delay prevents this error msg from polluting the console
+    # device (wlan0): interface index 2 renamed iface from 'wlan0' to 'wlp1s0f0'
+    echo "### Adding delay to NetworkManager.service..."
+    sed -i '/ExecStart=.*$/iExecStartPre=/usr/bin/sleep 2' $mnt_usb/usr/lib/systemd/system/NetworkManager.service
     echo "### Enabling system services..."
-    chroot $mnt_usb systemctl enable iwd.service sshd.service systemd-networkd.service
+    chroot $mnt_usb systemctl enable NetworkManager.service sshd.service
     echo "### Remove unneeded efi image..."
     rm -f $mnt_usb/efi/EFI/Linux/*.efi
     # selinux enforcing mode still needs to be fully tested out

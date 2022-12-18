@@ -19,6 +19,8 @@ RootSize=1.2G
 [Content]
 WithDocs=True
 Packages=
+    NetworkManager
+    NetworkManager-wifi
     alsa-ucm-asahi
     asahi-scripts
     arch-install-scripts
@@ -39,7 +41,6 @@ Packages=
     hostname
     iproute
     iputils
-    iwd
     kernel
     kmod
     light
@@ -57,12 +58,14 @@ Packages=
     rsync
     selinux-policy
     sudo
-    systemd-networkd
     tar
     usbutils
     vim-minimal
     vim-enhanced
     wget
+    wpa_supplicant
+    zram-generator
+    zram-generator-defaults
 
 [Validation]
 Password=fedora
