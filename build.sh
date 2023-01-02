@@ -60,7 +60,6 @@ umount_image() {
 mount_usb() {
     # mounts an existing usb drive to mnt_usb/ so you can inspect the contents or chroot into it...etc
     echo '### Mounting usb partitions...'
-    #systemctl daemon-reload
     sleep 1
     # first try to mount the usb partitions via their uuid
     if [ $(blkid | egrep -i "$EFI_UUID|$ROOT_UUID" | wc -l) -eq 2 ]; then
@@ -80,6 +79,7 @@ mount_usb() {
     fi
 
     sleep 1
+    systemctl daemon-reload
 }
 
 umount_usb() {
