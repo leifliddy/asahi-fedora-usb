@@ -16,7 +16,6 @@ if [ "$(whoami)" != 'root' ]; then
 fi
 
 
-# specify the usb device with the -d argument
 while getopts d:w arg
 do
     case "${arg}" in
