@@ -146,7 +146,7 @@ prepare_usb_device() {
     # root parition will take up all remaining space
     echo -e 'o\ny\nn\n\n\n+2G\nef00\nn\n\n\n\n8300\nw\ny\n' | gdisk $usb_device
     mkfs.vfat -F 32 -n 'EFI-USB-FED' -i $(echo $EFI_UUID | tr -d '-') ${usb_device}1 || mkfs.vfat -F 32 -n 'EFI-USB-FED' -i $(echo $EFI_UUID | tr -d '-') ${usb_device}p1
-    mkfs.ext4 -O '^metadata_csum' -U $ROOT_UUID -L 'fedora-usb-root' -F ${usb_device}2 || mkfs.ext4 -O '^metadata_csum' -U $ROOT_UUID -L 'fedora-usb-root' -F ${usb_device}p2
+    mkfs.ext4 -U $ROOT_UUID -L 'fedora-usb-root' -F ${usb_device}2 || mkfs.ext4 -U $ROOT_UUID -L 'fedora-usb-root' -F ${usb_device}p2
     systemctl daemon-reload
 
     if [ $(blkid | grep -Ei "$EFI_UUID|$ROOT_UUID" | wc -l) -ne 2 ]; then
