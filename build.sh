@@ -135,7 +135,7 @@ prepare_usb_device() {
 mkosi_create_rootfs() {
     mkosi clean
     rm -rf .mkosi-*
-    wget https://leifliddy.com/asahi-linux/asahi-linux.repo -O mkosi.skeleton/etc/yum.repos.d/asahi-linux.repo
+    wget https://leifliddy.com/asahi-linux/asahi-linux.repo -O mkosi.reposdir/asahi-linux.repo
     mkosi
 }
 
@@ -161,15 +161,20 @@ install_usb() {
     # generate a machine-id
     chroot $mnt_usb systemd-machine-id-setup
     chroot $mnt_usb echo "KERNEL_INSTALL_MACHINE_ID=$(cat /etc/machine-id)" > /etc/machine-info
-    echo '### Updating GRUB...'
-    arch-chroot $mnt_usb /usr/sbin/update-grub
+    echo '### Generating GRUB config...'
+    sed -i "s/BOOT_UUID_PLACEHOLDER/$BOOT_UUID/" $mnt_usb/boot/efi/EFI/fedora/grub.cfg
+    arch-chroot $mnt_usb /usr/sbin/grub2-mkconfig -o /boot/grub2/grub.cfg
     echo "### Creating BLS (/boot/loader/entries/) entry..."
     chroot $mnt_usb /image.creation/create.bls.entry
+    # adding a small delay prevents this error msg from polluting the console
+    # device (wlan0): interface index 2 renamed iface from 'wlan0' to 'wlp1s0f0'
+    echo "### Adding delay to NetworkManager.service..."
+    sed -i '/ExecStart=.*$/iExecStartPre=/usr/bin/sleep 2' $mnt_usb/usr/lib/systemd/system/NetworkManager.service
     echo "### Enabling system services..."
-    chroot $mnt_usb systemctl enable iwd.service sshd.service systemd-networkd.service
+    chroot $mnt_usb systemctl enable NetworkManager.service sshd.service
     echo "### Disabling systemd-firstboot..."
     chroot $mnt_usb rm -f /usr/lib/systemd/system/sysinit.target.wants/systemd-firstboot.service
-    rm -f  $mnt_usb/etc/machine-id
+    rm -f $mnt_usb/etc/kernel/{cmdline,entry-token,install.conf}
     rm -rf $mnt_usb/image.creation
     rm -f  $mnt_usb/etc/dracut.conf.d/initial-boot.conf
     find $mnt_usb/boot/efi/ -type f | xargs chmod 700

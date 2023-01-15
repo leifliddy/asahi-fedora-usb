@@ -2,8 +2,7 @@
 Distribution=fedora
 Release=37
 Architecture=aarch64
-UseHostRepositories=yes
-Repositories=fedora,updates,asahi-linux
+RepositoryDirectories=mkosi.reposdir
 
 [Output]
 Format=directory
@@ -13,9 +12,12 @@ Hostname=fedora
 
 [Content]
 WithDocs=True
+Environment=
+    KERNEL_INSTALL_BYPASS=0
 Packages=
+    NetworkManager
+    NetworkManager-wifi
     alsa-ucm-asahi
-    asahi-firstboot
     asahi-scripts
     arch-install-scripts
     audit
@@ -38,7 +40,6 @@ Packages=
     hostname
     iproute
     iputils
-    iwd
     kernel
     kmod
     linux-firmware
@@ -54,13 +55,16 @@ Packages=
     rpm
     rsync
     selinux-policy
+    shim-aa64
     sudo
-    systemd-networkd
     tar
     usbutils
     vim-minimal
     vim-enhanced
     wget
+    wpa_supplicant
+    zram-generator
+    zram-generator-defaults
 
 [Validation]
 Password=fedora
