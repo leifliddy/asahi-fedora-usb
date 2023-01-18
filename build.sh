@@ -24,7 +24,7 @@ fi
 
 
 # specify the usb device with the -d argument
-while getopts d:w arg
+while getopts :d:w arg
 do
     case "${arg}" in
         d) usb_device=${OPTARG};;
@@ -35,7 +35,7 @@ done
 
 mount_usb() {
     # mounts an existing usb drive to mnt_usb/ so you can inspect the contents or chroot into it...etc
-    echo '### Mounting usb partitions...'
+    echo '### Mounting usb partitions'
     systemctl daemon-reload
     sleep 1
     # first try to mount the usb partitions via their uuid
@@ -63,7 +63,7 @@ umount_usb() {
         return
     fi
 
-    echo '### Unmounting usb partitions...'
+    echo '### Unmounting usb partitions'
     [[ "$(findmnt -n $mnt_usb/boot/efi)" ]] && umount $mnt_usb/boot/efi
     [[ "$(findmnt -n $mnt_usb/boot)" ]] && umount $mnt_usb/boot
     [[ "$(findmnt -n $mnt_usb)" ]] && umount $mnt_usb
@@ -84,12 +84,12 @@ wipe_usb() {
     fi
 
     if [ ! "$(findmnt -n $mnt_usb)" ]; then
-        echo -e '### The usb drive did not mount\nparitioning disk...\n'
+        echo -e '### The usb drive did not mount\nparitioning disk\n'
         wipe=false
         return
     fi
 
-    echo '### Wiping usb partitions...'
+    echo '### Wiping usb partitions'
     [[ "$(findmnt -n $mnt_usb/boot/efi)" ]] && rm -rf $mnt_usb/boot/efi/* && umount $mnt_usb/boot/efi
     [[ "$(findmnt -n $mnt_usb/boot)" ]] &&  rm -rf $mnt_usb/boot/* && umount $mnt_usb/boot
     [[ "$(findmnt -n $mnt_usb)" ]] && rm -rf $mnt_usb/* && umount $mnt_usb
@@ -116,7 +116,7 @@ mkdir -p $mnt_usb $mkosi_rootfs
 
 prepare_usb_device() {
     umount_usb
-    echo '### Preparing USB device...'
+    echo '### Preparing USB device'
     # create 5GB root partition
     #echo -e 'o\ny\nn\n\n\n+600M\nef00\nn\n\n\n+1G\n8300\nn\n\n\n+5G\n8300\nw\ny\n' | gdisk "$usb_device"
     # root parition will take up all remaining space
@@ -127,7 +127,7 @@ prepare_usb_device() {
     systemctl daemon-reload
 
     if [ $(blkid | grep -Ei "$EFI_UUID|$BOOT_UUID|$ROOT_UUID" | wc -l) -ne 3 ]; then
-        echo -e "\nthe partitions and/or filesystem were not created correctly on $usb_device\nexiting...\n"
+        echo -e "\nthe partitions and/or filesystem were not created correctly on $usb_device\nexiting\n"
         exit
     fi
 }
@@ -144,43 +144,54 @@ install_usb() {
     [[ "$(findmnt -n $mnt_usb/boot/efi)" ]] && umount $mnt_usb/boot/efi
     [[ "$(findmnt -n $mnt_usb/boot)" ]] && umount $mnt_usb/boot
     [[ "$(findmnt -n $mnt_usb)" ]] && umount $mnt_usb
-    echo '### Cleaning up...'
+    echo '### Cleaning up'
     rm -f $mkosi_rootfs/var/cache/dnf/*
-    echo '### Mounting usb partitions and copying files...'
+    echo '### Mounting usb partitions and copying files'
     mount -U $ROOT_UUID $mnt_usb
     rsync -aHAX --delete --exclude '/tmp/*' --exclude '/boot/*' $mkosi_rootfs/ $mnt_usb
     mount -U $BOOT_UUID $mnt_usb/boot
     rsync -aHAX --delete $mkosi_rootfs/boot/ --exclude '/efi/*' $mnt_usb/boot
     mount -U $EFI_UUID $mnt_usb/boot/efi
     rsync -aHA --delete $mkosi_rootfs/boot/efi/ $mnt_usb/boot/efi
-    echo '### Setting uuids for partitions in /etc/fstab...'
+    echo '### Setting uuids for partitions in /etc/fstab'
     sed -i "s/EFI_UUID_PLACEHOLDER/$EFI_UUID/" $mnt_usb/etc/fstab
     sed -i "s/BOOT_UUID_PLACEHOLDER/$BOOT_UUID/" $mnt_usb/etc/fstab
     sed -i "s/ROOT_UUID_PLACEHOLDER/$ROOT_UUID/" $mnt_usb/etc/fstab
-    echo '### Running systemd-machine-id-setup...'
+    sed -i "s/BOOT_UUID_PLACEHOLDER/$BOOT_UUID/" $mnt_usb/boot/efi/EFI/fedora/grub.cfg
+
+    echo '### Running systemd-machine-id-setup'
     # generate a machine-id
     chroot $mnt_usb systemd-machine-id-setup
     chroot $mnt_usb echo "KERNEL_INSTALL_MACHINE_ID=$(cat /etc/machine-id)" > /etc/machine-info
-    echo '### Generating GRUB config...'
-    sed -i "s/BOOT_UUID_PLACEHOLDER/$BOOT_UUID/" $mnt_usb/boot/efi/EFI/fedora/grub.cfg
-    arch-chroot $mnt_usb /usr/sbin/grub2-mkconfig -o /boot/grub2/grub.cfg
-    echo "### Creating BLS (/boot/loader/entries/) entry..."
+
+    echo -e '\n### Generating GRUB config'
+    arch-chroot $mnt_usb grub2-editenv create
+    # /etc/grub.d/30_uefi-firmware creates a uefi grub boot entry that doesn't work on this platform
+    chroot $mnt_usb chmod -x /etc/grub.d/30_uefi-firmware
+    arch-chroot $mnt_usb grub2-mkconfig -o /boot/grub2/grub.cfg
+
+    echo "### Creating BLS (/boot/loader/entries/) entry"
     chroot $mnt_usb /image.creation/create.bls.entry
+
     # adding a small delay prevents this error msg from polluting the console
     # device (wlan0): interface index 2 renamed iface from 'wlan0' to 'wlp1s0f0'
-    echo "### Adding delay to NetworkManager.service..."
+    echo "### Adding delay to NetworkManager.service"
     sed -i '/ExecStart=.*$/iExecStartPre=/usr/bin/sleep 2' $mnt_usb/usr/lib/systemd/system/NetworkManager.service
-    echo "### Enabling system services..."
+    echo "### Enabling system services"
     chroot $mnt_usb systemctl enable NetworkManager.service sshd.service
-    echo "### Disabling systemd-firstboot..."
+    echo "### Disabling systemd-firstboot"
     chroot $mnt_usb rm -f /usr/lib/systemd/system/sysinit.target.wants/systemd-firstboot.service
-    rm -f $mnt_usb/etc/kernel/{cmdline,entry-token,install.conf}
-    rm -rf $mnt_usb/image.creation
-    rm -f  $mnt_usb/etc/dracut.conf.d/initial-boot.conf
-    find $mnt_usb/boot/efi/ -type f | xargs chmod 700
+
     echo "### Setting selinux to permissive"
     sed -i 's/^SELINUX=.*$/SELINUX=permissive/' $mnt_usb/etc/selinux/config
-    echo '### Unmounting usb partitions...'
+
+    ###### post-install cleanup ######
+    rm -f  $mnt_usb/etc/kernel/{cmdline,entry-token,install.conf}
+    rm -rf $mnt_usb/image.creation
+    rm -f  $mnt_usb/etc/yum.repos.d/{fedora.repo.rpmnew,fedora-updates.repo.rpmnew}
+    find   $mnt_usb/boot/efi/ -type f | xargs chmod 700
+
+    echo '### Unmounting usb partitions'
     umount $mnt_usb/boot/efi
     umount $mnt_usb/boot
     umount $mnt_usb

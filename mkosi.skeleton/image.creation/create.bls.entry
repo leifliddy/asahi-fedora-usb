@@ -11,3 +11,9 @@ kernel_version=$(rpm -q kernel | sed 's/kernel-//')
 title="${NAME} (${kernel_version}) ${VERSION}"
 
 grubby --add-kernel=$kernel_vmlinuz --initrd=$initramfs --title "$title"
+
+bls_conf=$(find /boot/loader/entries/ -type f | grep '.conf$'| tail -1)
+# remove the id line
+sed -i '/^id .*/d' $bls_conf
+# change 'grub_class kernel' to 'grub_class fedora'
+sed -i 's/grub_class kernel/grub_class fedora/' $bls_conf
