@@ -6,3 +6,4 @@ fedora.initrd
 fedora.raw
 fedora.raw.manifest
 fedora.vmlinuz
+mkosi.reposdir
