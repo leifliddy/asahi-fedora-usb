@@ -166,14 +166,16 @@ install_usb() {
     chroot $mnt_usb systemd-machine-id-setup
     chroot $mnt_usb echo "KERNEL_INSTALL_MACHINE_ID=$(cat /etc/machine-id)" > /etc/machine-info
 
-    echo -e '\n### Generating GRUB config'
+
+    echo "### Creating BLS (/boot/loader/entries/) entry"
     arch-chroot $mnt_usb grub2-editenv create
+    rm -f $mnt_usb/etc/kernel/cmdline
+    arch-chroot $mnt_usb /image.creation/create.bls.entry
+
+    echo -e '\n### Generating GRUB config'
     # /etc/grub.d/30_uefi-firmware creates a uefi grub boot entry that doesn't work on this platform
     chroot $mnt_usb chmod -x /etc/grub.d/30_uefi-firmware
     arch-chroot $mnt_usb grub2-mkconfig -o /boot/grub2/grub.cfg
-
-    echo "### Creating BLS (/boot/loader/entries/) entry"
-    chroot $mnt_usb /image.creation/create.bls.entry
 
     # adding a small delay prevents this error msg from polluting the console
     # device (wlan0): interface index 2 renamed iface from 'wlan0' to 'wlp1s0f0'
@@ -190,9 +192,9 @@ install_usb() {
     sed -i 's/^SELINUX=.*$/SELINUX=permissive/' $mnt_usb/etc/selinux/config
 
     ###### post-install cleanup ######
-    rm -f  $mnt_usb/etc/kernel/{cmdline,entry-token,install.conf}
+    echo -e '\n### Cleanup'
+    rm -f  $mnt_usb/etc/kernel/{entry-token,install.conf}
     rm -rf $mnt_usb/image.creation
-    find   $mnt_usb/boot/efi/ -type f | xargs chmod 700
 
     echo '### Unmounting usb partitions'
     umount $mnt_usb/boot/efi
