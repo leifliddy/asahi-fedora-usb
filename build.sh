@@ -135,7 +135,9 @@ prepare_usb_device() {
 mkosi_create_rootfs() {
     mkosi clean
     rm -rf .mkosi-*
-    wget https://leifliddy.com/asahi-linux/asahi-linux.repo -O mkosi.reposdir/asahi-linux.repo
+    mkdir -p mkosi.skeleton/etc/yum.repos.d
+    wget https://leifliddy.com/asahi-linux/asahi-linux.repo -O mkosi.skeleton/etc/yum.repos.d/asahi-linux.repo
+    [[ ! -L mkosi.reposdir ]] && ln -s mkosi.skeleton/etc/yum.repos.d/ mkosi.reposdir
     mkosi
 }
 
@@ -177,8 +179,10 @@ install_usb() {
     # device (wlan0): interface index 2 renamed iface from 'wlan0' to 'wlp1s0f0'
     echo "### Adding delay to NetworkManager.service"
     sed -i '/ExecStart=.*$/iExecStartPre=/usr/bin/sleep 2' $mnt_usb/usr/lib/systemd/system/NetworkManager.service
+
     echo "### Enabling system services"
-    chroot $mnt_usb systemctl enable NetworkManager.service sshd.service
+    chroot $mnt_usb systemctl enable NetworkManager sshd systemd-resolved
+
     echo "### Disabling systemd-firstboot"
     chroot $mnt_usb rm -f /usr/lib/systemd/system/sysinit.target.wants/systemd-firstboot.service
 
@@ -188,7 +192,6 @@ install_usb() {
     ###### post-install cleanup ######
     rm -f  $mnt_usb/etc/kernel/{cmdline,entry-token,install.conf}
     rm -rf $mnt_usb/image.creation
-    rm -f  $mnt_usb/etc/yum.repos.d/{fedora.repo.rpmnew,fedora-updates.repo.rpmnew}
     find   $mnt_usb/boot/efi/ -type f | xargs chmod 700
 
     echo '### Unmounting usb partitions'

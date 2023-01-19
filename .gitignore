@@ -7,3 +7,4 @@ asahi-linux.repo
 firmware.tar
 manifest.txt
 all_firmware.tar.gz
+mkosi.reposdir
