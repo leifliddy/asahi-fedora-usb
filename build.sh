@@ -58,7 +58,7 @@ umount_image() {
 
 mount_usb() {
     # mounts an existing usb drive to mnt_usb/ so you can inspect the contents or chroot into it...etc
-    echo '### Mounting usb partitions...'
+    echo '### Mounting usb partitions'
     sleep 1
     # first try to mount the usb partitions via their uuid
     if [ $(blkid | egrep -i "$EFI_UUID|$ROOT_UUID" | wc -l) -eq 2 ]; then
@@ -87,7 +87,7 @@ umount_usb() {
         return
     fi
 
-    echo '### Unmounting usb partitions...'
+    echo '### Unmounting usb partitions'
     [[ "$(findmnt -n $mnt_usb/efi)" ]] && umount $mnt_usb/efi
     [[ "$(findmnt -n $mnt_usb)" ]] && umount $mnt_usb
 }
@@ -104,12 +104,12 @@ wipe_usb() {
     fi
 
     if [ ! "$(findmnt -n $mnt_usb)" ]; then
-        echo -e '### The usb drive did not mount\nparitioning disk...\n'
+        echo -e '### The usb drive did not mount\nparitioning disk\n'
         wipe=false
         return
     fi
 
-    echo '### Wiping usb partitions...'
+    echo '### Wiping usb partitions'
     [[ "$(findmnt -n $mnt_usb/efi)" ]] && rm -rf $mnt_usb/efi/* && umount $mnt_usb/efi
     [[ "$(findmnt -n $mnt_usb)" ]] && rm -rf $mnt_usb/* && umount $mnt_usb
 }
@@ -140,7 +140,7 @@ mkdir -p $mnt_img $mnt_usb
 
 prepare_usb_device() {
     umount_usb
-    echo '### Preparing USB device...'
+    echo '### Preparing USB device'
     # create 5GB root partition
     #echo -e 'o\ny\nn\n\n\n+2G\nef00\nn\n\n\n+1G\n8300\nw\ny\n' | gdisk "$usb_device"
     # root parition will take up all remaining space
@@ -168,23 +168,29 @@ install_usb() {
     mount_image
     # ensure usb drive is not mounted
     mount_usb
-    echo '### Rsyncing files...'
+    echo '### Rsyncing files'
     rsync -aHAX --delete --exclude={"/dev/*","/proc/*","/sys/*","/lost+found/","/efi/*"} $mnt_img/ $mnt_usb
     rsync -aHA  --delete $mnt_img/efi/ $mnt_usb/efi
     umount_image
-    echo '### Setting uuids for partitions in /etc/fstab...'
+
+    echo '### Setting uuids for partitions in /etc/fstab'
     sed -i "s/EFI_UUID_PLACEHOLDER/$EFI_UUID/" $mnt_usb/etc/fstab
     sed -i "s/ROOT_UUID_PLACEHOLDER/$ROOT_UUID/" $mnt_usb/etc/fstab
-    echo "### Setting systemd-boot timeout value..."
+
+    echo "### Setting systemd-boot timeout value"
     sed -i 's/#timeout.*$/timeout 5/' $mnt_usb/efi/loader/loader.conf
+
     # adding a small delay prevents this error msg from polluting the console
     # device (wlan0): interface index 2 renamed iface from 'wlan0' to 'wlp1s0f0'
-    echo "### Adding delay to NetworkManager.service..."
+    echo "### Adding delay to NetworkManager.service"
     sed -i '/ExecStart=.*$/iExecStartPre=/usr/bin/sleep 2' $mnt_usb/usr/lib/systemd/system/NetworkManager.service
-    echo "### Enabling system services..."
-    chroot $mnt_usb systemctl enable NetworkManager.service sshd.service
-    echo "### Remove unneeded efi image..."
+
+    echo "### Enabling system services"
+    chroot $mnt_usb systemctl enable NetworkManager sshd systemd-resolved
+
+    echo "### Remove unneeded efi image"
     rm -f $mnt_usb/efi/EFI/Linux/*.efi
+
     # selinux enforcing mode still needs to be fully tested out
     # probably a good idea to run restorecon -Rv / after the first boot
     echo "### Setting selinux to permissive"

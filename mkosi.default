@@ -2,8 +2,8 @@
 Distribution=fedora
 Release=37
 Architecture=aarch64
-UseHostRepositories=yes
-Repositories=fedora,updates,asahi-linux
+UseHostRepositories=no
+#Repositories=asahi-linux
 
 [Output]
 Format=gpt_ext4
@@ -58,6 +58,7 @@ Packages=
     rsync
     selinux-policy
     sudo
+    systemd-resolved
     tar
     usbutils
     vim-minimal
