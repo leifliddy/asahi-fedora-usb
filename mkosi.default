@@ -3,7 +3,6 @@ Distribution=fedora
 Release=37
 Architecture=aarch64
 UseHostRepositories=no
-#Repositories=asahi-linux
 
 [Output]
 Format=gpt_ext4
