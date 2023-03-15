@@ -1,0 +1,65 @@
+#!/bin/bash
+
+set -e
+
+# creates a bootable grub image and copies it to /boot/efi/EFI/BOOT/BOOTAA64.EFI
+# the BOOTAA64.EFI bootloader provided by the shim-aa64 package takes way too long to boot on apple silicon systems
+# the BOOTAA64.EFI bootloader produced by this script is much faster
+# simply install the shim-aa64 rpm if you would rather use the stock Fedora BOOTAA64.EFI bootloader
+
+BOOT_PART='/boot'
+GRUB_DIR="$BOOT_PART/grub2"
+EFI_BOOTLOADER='/boot/efi/EFI/BOOT/BOOTAA64.EFI'
+GRUB_MODULES='ext2 part_gpt search btrfs'
+
+boot_uuid=$(grub2-probe $BOOT_PART -t fs_uuid)
+root_uuid=$(grub2-probe / -t fs_uuid)
+part=$(grub2-probe $BOOT_PART -t drive | sed -e 's/(.*,/hd0,/' | tr -d ')')
+[[ $(echo $part | grep '/dev/loop') ]] && unset part
+
+if [ -z $boot_uuid ]; then
+    echo "Error: Unable to determine root filesystem UUID"
+    exit 1
+fi
+
+# rsync grub2 modules to /boot/grub2/arm64-efi
+rsync -avr --quiet --delete /usr/lib/grub/arm64-efi /boot/grub2/
+
+boot_dev_path=$(blkid -U $boot_uuid)
+boot_fstype=$(blkid -s TYPE -o value $boot_dev_path)
+
+# we need to include a preceding /boot
+# 1. if there is no separate /boot partition
+# 2. if the boot partition is on a btrfs subvolume
+if [[ $boot_uuid == $root_uuid ]] || [[ $boot_fstype == 'btrfs' ]]; then
+    PREFIX_GRUB_DIR=$GRUB_DIR
+else
+    PREFIX_GRUB_DIR='/grub2'
+fi
+
+echo "boot UUID: $boot_uuid"
+echo "root UUID: $root_uuid"
+[[ -n $part ]] && echo "Partition: $part"
+echo -e "prefix_grub_dir: $PREFIX_GRUB_DIR\n"
+
+cat > /tmp/grub-core.cfg <<EOF
+search.fs_uuid $boot_uuid root $part
+set prefix=(\$root)$PREFIX_GRUB_DIR
+EOF
+
+echo 'Generating GRUB image...'
+grub2-mkimage \
+    --directory '/usr/lib/grub/arm64-efi' \
+    -c /tmp/grub-core.cfg \
+    --prefix $PREFIX_GRUB_DIR \
+    --output $GRUB_DIR/arm64-efi/core.efi \
+    --format arm64-efi \
+    --compression auto \
+    $GRUB_MODULES
+
+[[ ! -e $GRUB_DIR/arm64-efi/core.efi ]] && echo -e "Error creating $GRUB_DIR/arm64-efi/core.efi\nexiting..." && exit
+[[ -e $EFI_BOOTLOADER ]] && mv -f $EFI_BOOTLOADER ${EFI_BOOTLOADER}.old
+
+cp $GRUB_DIR/arm64-efi/core.efi $EFI_BOOTLOADER
+echo 'EFI Bootloader Created'
+ls -lA $EFI_BOOTLOADER

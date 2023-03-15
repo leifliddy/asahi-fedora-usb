@@ -134,9 +134,9 @@ prepare_usb_device() {
 
 mkosi_create_rootfs() {
     mkosi clean
-    rm -rf .mkosi-*
+    rm -rf .mkosi*
     mkdir -p mkosi.skeleton/etc/yum.repos.d
-    wget https://leifliddy.com/asahi-linux/asahi-linux.repo -O mkosi.skeleton/etc/yum.repos.d/asahi-linux.repo
+    curl https://leifliddy.com/asahi-linux/asahi-linux.repo --output mkosi.skeleton/etc/yum.repos.d/asahi-linux.repo
     [[ ! -L mkosi.reposdir ]] && ln -s mkosi.skeleton/etc/yum.repos.d/ mkosi.reposdir
     mkosi
 }
@@ -163,9 +163,12 @@ install_usb() {
 
     echo '### Running systemd-machine-id-setup'
     # generate a machine-id
+    [[ -f $mnt_usb//etc/machine-id ]] && rm -f $mnt_usb//etc/machine-id
     chroot $mnt_usb systemd-machine-id-setup
     chroot $mnt_usb echo "KERNEL_INSTALL_MACHINE_ID=$(cat /etc/machine-id)" > /etc/machine-info
 
+    echo -e '\n### Generating EFI bootloader'
+    arch-chroot $mnt_usb create-efi-bootloader
 
     echo "### Creating BLS (/boot/loader/entries/) entry"
     arch-chroot $mnt_usb grub2-editenv create
@@ -195,6 +198,7 @@ install_usb() {
     echo -e '\n### Cleanup'
     rm -f  $mnt_usb/etc/kernel/{entry-token,install.conf}
     rm -rf $mnt_usb/image.creation
+    rm -f $mnt_usb/etc/dracut.conf.d/initial-boot.conf
 
     echo '### Unmounting usb partitions'
     umount $mnt_usb/boot/efi
@@ -210,5 +214,6 @@ install_usb() {
 # then remove the files from disk vs repartitioning it
 # warning: this feature is experimental
 [[ $wipe = true ]] && wipe_usb || prepare_usb_device
+[[ $(command -v getenforce) ]] && setenforce 0
 mkosi_create_rootfs
 install_usb
