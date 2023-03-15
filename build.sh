@@ -154,7 +154,7 @@ install_usb() {
     mount -U $BOOT_UUID $mnt_usb/boot
     rsync -aHAX --delete $mkosi_rootfs/boot/ --exclude '/efi/*' $mnt_usb/boot
     mount -U $EFI_UUID $mnt_usb/boot/efi
-    rsync -aHA --delete $mkosi_rootfs/boot/efi/ $mnt_usb/boot/efi
+    rsync -aH --delete $mkosi_rootfs/boot/efi/ $mnt_usb/boot/efi
     echo '### Setting uuids for partitions in /etc/fstab'
     sed -i "s/EFI_UUID_PLACEHOLDER/$EFI_UUID/" $mnt_usb/etc/fstab
     sed -i "s/BOOT_UUID_PLACEHOLDER/$BOOT_UUID/" $mnt_usb/etc/fstab
