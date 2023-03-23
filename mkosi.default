@@ -17,6 +17,7 @@ Environment=
 Packages=
     NetworkManager
     NetworkManager-wifi
+    acl
     alsa-ucm-asahi
     asahi-scripts
     arch-install-scripts
