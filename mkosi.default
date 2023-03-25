@@ -1,6 +1,6 @@
 [Distribution]
 Distribution=fedora
-Release=37
+Release=38
 Architecture=aarch64
 RepositoryDirectories=mkosi.reposdir
 
@@ -19,6 +19,8 @@ Packages=
     NetworkManager-wifi
     acl
     alsa-ucm-asahi
+    asahi-repos-common
+    asahi-repos-edge
     asahi-scripts
     arch-install-scripts
     audit

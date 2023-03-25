@@ -39,7 +39,7 @@ mount_usb() {
     systemctl daemon-reload
     sleep 1
     # first try to mount the usb partitions via their uuid
-    if [ $(blkid | egrep -i "$EFI_UUID|$BOOT_UUID|$ROOT_UUID" | wc -l) -eq 3 ]; then
+    if [ $(blkid | grep -Ei "$EFI_UUID|$BOOT_UUID|$ROOT_UUID" | wc -l) -eq 3 ]; then
         [[ -z "$(findmnt -n $mnt_usb)" ]] && mount -U $ROOT_UUID $mnt_usb
         [[ -z "$(findmnt -n $mnt_usb/boot)" ]] && mount -U $BOOT_UUID $mnt_usb/boot
         [[ -z "$(findmnt -n $mnt_usb/boot/efi)" ]] && mount -U $EFI_UUID $mnt_usb/boot/efi
@@ -73,7 +73,7 @@ wipe_usb() {
     # wipe the contents of the usb drive to avoid having to repartition it
 
     # first check if the paritions exist
-    if [ $(blkid | egrep -i "$EFI_UUID|$BOOT_UUID|$ROOT_UUID" | wc -l) -eq 3 ]; then
+    if [ $(blkid | grep -Ei "$EFI_UUID|$BOOT_UUID|$ROOT_UUID" | wc -l) -eq 3 ]; then
         [[ -z "$(findmnt -n $mnt_usb)" ]] && mount -U $ROOT_UUID $mnt_usb
         if [ -e $mnt_usb/boot ]; then
             [[ -z "$(findmnt -n $mnt_usb/boot)" ]] && mount -U $BOOT_UUID $mnt_usb/boot
@@ -135,9 +135,9 @@ prepare_usb_device() {
 mkosi_create_rootfs() {
     mkosi clean
     rm -rf .mkosi*
-    mkdir -p mkosi.skeleton/etc/yum.repos.d
-    curl https://leifliddy.com/asahi-linux/asahi-linux.repo --output mkosi.skeleton/etc/yum.repos.d/asahi-linux.repo
-    [[ ! -L mkosi.reposdir ]] && ln -s mkosi.skeleton/etc/yum.repos.d/ mkosi.reposdir
+    #mkdir -p mkosi.skeleton/etc/yum.repos.d
+    #curl https://leifliddy.com/asahi-linux/asahi-linux.repo --output mkosi.skeleton/etc/yum.repos.d/asahi-linux.repo
+    #[[ ! -L mkosi.reposdir ]] && ln -s mkosi.skeleton/etc/yum.repos.d/ mkosi.reposdir
     mkosi
 }
 
@@ -186,13 +186,16 @@ install_usb() {
     sed -i '/ExecStart=.*$/iExecStartPre=/usr/bin/sleep 2' $mnt_usb/usr/lib/systemd/system/NetworkManager.service
 
     echo "### Enabling system services"
-    chroot $mnt_usb systemctl enable NetworkManager sshd systemd-resolved
+    arch-chroot $mnt_usb systemctl enable NetworkManager sshd systemd-resolved
 
     echo "### Disabling systemd-firstboot"
     chroot $mnt_usb rm -f /usr/lib/systemd/system/sysinit.target.wants/systemd-firstboot.service
 
     echo "### Setting selinux to permissive"
     sed -i 's/^SELINUX=.*$/SELINUX=permissive/' $mnt_usb/etc/selinux/config
+
+    # there's an odd issue where user: root rwx acls get recursively placed on everything
+    arch-chroot $mnt_usb setfacl -Rb /
 
     ###### post-install cleanup ######
     echo -e '\n### Cleanup'
