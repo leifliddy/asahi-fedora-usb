@@ -34,6 +34,7 @@ To boot the usb drive on an M1 system, enter the following ```u-boot``` command 
 ```
 run bootcmd_usb0
 ```
+## Setting up WiFi
 
 To connect to a wireless network, use the following sytanx:
 ```nmcli dev wifi connect network-ssid```
