@@ -39,6 +39,6 @@ run bootcmd_usb0
 
 To connect to a wireless network, use the following sytanx:
 ```nmcli dev wifi connect network-ssid```
-## 
+
 An actual example:
 ```nmcli dev wifi connect blacknet-ac password supersecretpassword```
