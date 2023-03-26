@@ -62,6 +62,7 @@ Packages=
     systemd-resolved
     sudo
     tar
+    terminus-fonts-console
     usbutils
     vim-minimal
     vim-enhanced
