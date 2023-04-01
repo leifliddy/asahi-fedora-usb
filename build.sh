@@ -194,9 +194,6 @@ install_usb() {
     echo "### Setting selinux to permissive"
     sed -i 's/^SELINUX=.*$/SELINUX=permissive/' $mnt_usb/etc/selinux/config
 
-    # there's an odd issue where user: root rwx acls get recursively placed on everything
-    arch-chroot $mnt_usb setfacl -Rb /
-
     ###### post-install cleanup ######
     echo -e '\n### Cleanup'
     rm -f  $mnt_usb/etc/kernel/{entry-token,install.conf}
