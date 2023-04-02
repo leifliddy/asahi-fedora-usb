@@ -32,7 +32,7 @@ Once the drive is created, you can locally mount and unmount the usb drive (whic
 
 To boot the usb drive on an M1 system, enter the following ```u-boot``` command at boot time:
 ```
-run bootcmd_usb0
+run usb_boot
 ```
   
 **Setting up WiFi**
