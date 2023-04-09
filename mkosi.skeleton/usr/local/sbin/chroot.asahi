@@ -1,6 +1,9 @@
  #!/bin/bash
 
-[[ -z "$(findmnt -n /mnt)" ]] && mount /dev/nvme0n1p6 -o subvol=root /mnt
+root_fs=$(blkid -s TYPE -o value /dev/nvme0n1p6)
+
+[[ $root_fs == "btrfs" ]] && options='-o subvol=root'
+[[ -z "$(findmnt -n /mnt)" ]] && mount /dev/nvme0n1p6 $options /mnt
 [[ -z "$(findmnt -n /mnt/boot)" ]] && mount /dev/nvme0n1p5 /mnt/boot
 [[ -z "$(findmnt -n /mnt/boot/efi)" ]] && mount /dev/nvme0n1p4 /mnt/boot/efi
 
