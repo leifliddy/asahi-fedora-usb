@@ -209,7 +209,6 @@ install_usb() {
 # ./build.sh -wd /dev/sda
 # and the disk partitions already exist (from a previous install)
 # then remove the files from disk vs repartitioning it
-# warning: this feature is experimental
 [[ $wipe = true ]] && wipe_usb || prepare_usb_device
 [[ $(command -v getenforce) ]] && setenforce 0
 mkosi_create_rootfs
