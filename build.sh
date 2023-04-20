@@ -116,11 +116,13 @@ mkdir -p $mnt_usb $mkosi_rootfs
 
 prepare_usb_device() {
     umount_usb
+    is_mounted=$(lsblk -no MOUNTPOINT $usb_device | sed '/^$/d')
+    [[ -n "$is_mounted" ]] && echo -e "\n### The usb drive is currently mounted here\n\n$(lsblk $usb_device)\n\n### Please unmount the drive and then re-run the script\n" && exit
     echo '### Preparing USB device'
     # create 5GB root partition
     #echo -e 'o\ny\nn\n\n\n+600M\nef00\nn\n\n\n+1G\n8300\nn\n\n\n+5G\n8300\nw\ny\n' | gdisk "$usb_device"
     # root partition will take up all remaining space
-    echo -e 'o\ny\nn\n\n\n+600M\nef00\nn\n\n\n+1G\n8300\nn\n\n\n\n8300\nw\ny\n' | gdisk "$usb_device"
+    echo -e 'o\ny\nn\n\n\n+600M\nef00\nn\n\n\n+1G\n8300\nn\n\n\n\n8300\nw\ny\n' | gdisk $usb_device
     mkfs.vfat -F 32 -n 'EFI-USB-FED' -i $(echo $EFI_UUID | tr -d '-') "$usb_device"1 || mkfs.vfat -F 32 -n 'EFI-USB-FED' -i $(echo $EFI_UUID | tr -d '-') "$usb_device"p1
     mkfs.ext4 -O '^metadata_csum' -U $BOOT_UUID -L 'fedora-usb-boot' -F "$usb_device"2 || mkfs.ext4 -O '^metadata_csum' -U $BOOT_UUID -L 'fedora-usb-boot' -F "$usb_device"p2
     mkfs.ext4 -O '^metadata_csum' -U $ROOT_UUID -L 'fedora-usb-root' -F "$usb_device"3 || mkfs.ext4 -O '^metadata_csum' -U $ROOT_UUID -L 'fedora-usb-root' -F "$usb_device"p3
