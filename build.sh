@@ -160,7 +160,7 @@ install_usb() {
 
     echo '### Running systemd-machine-id-setup'
     # generate a machine-id
-    [[ -f $mnt_usb//etc/machine-id ]] && rm -f $mnt_usb//etc/machine-id
+    [[ -f $mnt_usb/etc/machine-id ]] && rm -f $mnt_usb/etc/machine-id
     chroot $mnt_usb systemd-machine-id-setup
     chroot $mnt_usb echo "KERNEL_INSTALL_MACHINE_ID=$(cat /etc/machine-id)" > /etc/machine-info
 
