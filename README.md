@@ -35,7 +35,7 @@ To boot the usb drive on an M1 system, enter the following ```u-boot``` commands
 env set boot_efi_bootmgr
 run usb_boot
 ```
-If anyone knows an easier method to boot a usb drive -- please let me know   
+If anyone knows of an easier method -- please let me know   
   
 **Setting up WiFi**
 
