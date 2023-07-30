@@ -197,7 +197,8 @@ install_usb() {
     echo -e '\n### Cleanup'
     rm -f  $mnt_usb/etc/kernel/{entry-token,install.conf}
     rm -rf $mnt_usb/image.creation
-    rm -f $mnt_usb/etc/dracut.conf.d/initial-boot.conf
+    rm -f  $mnt_usb/etc/dracut.conf.d/initial-boot.conf
+    rm -f  $mnt_usb/etc/yum.repos.d/mkosi*.repo
 
     echo '### Unmounting usb partitions'
     umount $mnt_usb/boot/efi
