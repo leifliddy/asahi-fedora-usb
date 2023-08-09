@@ -190,8 +190,8 @@ install_usb() {
     echo "### Disabling systemd-firstboot"
     chroot $mnt_usb rm -f /usr/lib/systemd/system/sysinit.target.wants/systemd-firstboot.service
 
-    echo "### Setting selinux to permissive"
-    sed -i 's/^SELINUX=.*$/SELINUX=permissive/' $mnt_usb/etc/selinux/config
+    echo "### SElinux labeling filesystem"
+    arch-chroot $mnt_usb setfiles -F -p -c /etc/selinux/targeted/policy/policy.* -e /proc -e /sys -e /dev /etc/selinux/targeted/contexts/files/file_contexts /
 
     ###### post-install cleanup ######
     echo -e '\n### Cleanup'
