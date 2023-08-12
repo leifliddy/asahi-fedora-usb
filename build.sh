@@ -192,6 +192,7 @@ install_usb() {
 
     echo "### SElinux labeling filesystem"
     arch-chroot $mnt_usb setfiles -F -p -c /etc/selinux/targeted/policy/policy.* -e /proc -e /sys -e /dev /etc/selinux/targeted/contexts/files/file_contexts /
+    arch-chroot $mnt_usb setfiles -F -p -c /etc/selinux/targeted/policy/policy.* -e /proc -e /sys -e /dev /etc/selinux/targeted/contexts/files/file_contexts /boot
 
     ###### post-install cleanup ######
     echo -e '\n### Cleanup'
