@@ -6,9 +6,8 @@ dnf install arch-install-scripts bubblewrap gdisk qemu-user-static pandoc rsync 
 ```
 **note:** ```qemu-user-static``` is only needed if building on a non-```aarch64``` system.  
 
-**note:** until this PR is merged into the next `mkosi` release https://github.com/systemd/mkosi/pull/1264/commits  
-install mksoi from main:   
-`python3 -m pip install --user git+https://github.com/systemd/mkosi.git`  
+- Until version 15.x is released for Fedora, install mksoi from git:  
+`python3 -m pip install --user git+https://github.com/systemd/mkosi.git@v15.1`
 
 
 To build a minimal Fedora image and install it to a usb drive, simply run:
