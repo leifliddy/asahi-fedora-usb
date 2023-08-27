@@ -107,12 +107,10 @@ elif [[ $1 == 'umount' ]] || [[ $1 == 'unmount' ]]; then
     exit
 fi
 
-
 [[ -z $usb_device ]] && echo -e "\nyou must specify a usb device ie\n./build.sh -d /dev/sda\n" && exit
 [[ ! -e $usb_device ]] && echo -e "\n$usb_device doesn't exist\n" && exit
 
 mkdir -p $mnt_usb $mkosi_rootfs
-
 
 prepare_usb_device() {
     umount_usb
