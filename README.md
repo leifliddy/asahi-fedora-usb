@@ -43,3 +43,16 @@ To connect to a wireless network, use the following sytanx:
 
 An actual example:
 ```nmcli dev wifi connect blacknet-ac password supersecretpassword```
+
+**Rescuing a Fedora install**
+
+Two helper scripts have been added to this image  
+Which are useful if you have Fedora installed on the internal drive:
+```
+/usr/local/sbin/chroot.asahi
+/usr/local/sbin/umount.asahi
+```
+1. `chroot.asahi` will mount the (Fedora) internal drive under `/mnt` and will `arch-chroot` into it.  
+To exit from the `chroot` environment, simply type `ctrl+d` or `exit`
+
+2. `umount.asahi` will unmount the internal drive from `/mnt`
