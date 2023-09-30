@@ -6,7 +6,7 @@ dnf install arch-install-scripts bubblewrap gdisk qemu-user-static pandoc rsync 
 ```
 **note:** ```qemu-user-static``` is only needed if building on a non-```aarch64``` system.  
 
-- Until version 15.x is released for Fedora, install mksoi from git:  
+- Until version 15.x is released for Fedora, install mkosi from git:  
 `python3 -m pip install --user git+https://github.com/systemd/mkosi.git@v15.1`
 
 
