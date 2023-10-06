@@ -28,7 +28,7 @@ while getopts :d:w arg
 do
     case "${arg}" in
         d) usb_device=${OPTARG};;
-        w) wipe=true ;;
+        w) wipe=true;;
     esac
 done
 
