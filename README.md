@@ -44,6 +44,14 @@ Found Fedora Linux Asahi Remix 38 (Thirty Eight) on /dev/nvme0n1p6
 Found Fedora Linux Asahi Remix 38 (Thirty Eight) on /dev/sda3
 done
 ```
+You should now see the `/dev/sda3` entry in the main grub menu  
+If you don't see the grub menu at all or if the text is garbled, then ensure these options are set in `/etc/default/grub`  
+and run `grub2-mkconfig -o /boot/grub2/grub.cfg` afterwards  
+```
+GRUB_TIMEOUT=5
+GRUB_TIMEOUT_STYLE="menu"
+GRUB_TERMINAL_OUTPUT=""
+```
   
 **Setting up WiFi**
 
