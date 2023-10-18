@@ -29,12 +29,21 @@ Once the drive is created, you can locally mount and unmount the usb drive (whic
 ```
 **note:** mounting the usb drive is useful for inspecting the contents of the drive or making changes to it   
 
-To boot the usb drive on an M1 system, enter the following ```u-boot``` commands at boot time:
+To boot the usb drive on an apple silicon system, you could either:  
+1. Enter the following ```u-boot``` commands at boot time:  
 ```
 env set boot_efi_bootmgr
 run usb_boot
 ```
-If anyone knows of an easier method -- please let me know   
+2. Add the usb drive to the grub menu on the internal drive  
+You just need to boot Linux on the internal drive, plugin the usb drive, and then update grub 
+```
+[root@m1 ~]# grub2-mkconfig -o /boot/grub2/grub.cfg
+Generating grub configuration file ...
+Found Fedora Linux Asahi Remix 38 (Thirty Eight) on /dev/nvme0n1p6
+Found Fedora Linux Asahi Remix 38 (Thirty Eight) on /dev/sda3
+done
+```
   
 **Setting up WiFi**
 
