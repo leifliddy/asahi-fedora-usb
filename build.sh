@@ -147,11 +147,14 @@ install_usb() {
     rm -f $mkosi_rootfs/var/cache/dnf/*
     echo '### Mounting usb partitions and copying files'
     mount -U $ROOT_UUID $mnt_usb
-    rsync -aHAX --delete --exclude '/tmp/*' --exclude '/boot/*' $mkosi_rootfs/ $mnt_usb
+    rsync -aHAX --delete --exclude '/tmp/*' --exclude '/boot/*' --exclude '/efi' $mkosi_rootfs/ $mnt_usb
     mount -U $BOOT_UUID $mnt_usb/boot
-    rsync -aHAX --delete $mkosi_rootfs/boot/ --exclude '/efi/*' $mnt_usb/boot
+    rsync -aHAX --delete $mkosi_rootfs/boot/ $mnt_usb/boot
+    # mkosi >=v18 creates the following symlink in /boot: efi -> ../efi
+    [[ -L $mnt_usb/boot/efi ]] && rm -f $mnt_usb/boot/efi && mkdir $mnt_usb/boot/efi
     mount -U $EFI_UUID $mnt_usb/boot/efi
-    rsync -aH --delete $mkosi_rootfs/boot/efi/ $mnt_usb/boot/efi
+    echo "rsync -aH $mkosi_rootfs/efi/ $mnt_usb/boot/efi"
+    rsync -aH $mkosi_rootfs/efi/ $mnt_usb/boot/efi
     echo '### Setting uuids for partitions in /etc/fstab'
     sed -i "s/EFI_UUID_PLACEHOLDER/$EFI_UUID/" $mnt_usb/etc/fstab
     sed -i "s/BOOT_UUID_PLACEHOLDER/$BOOT_UUID/" $mnt_usb/etc/fstab
