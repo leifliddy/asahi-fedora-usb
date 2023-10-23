@@ -173,7 +173,7 @@ install_usb() {
     echo '### running kernel-install'
     arch-chroot $mnt_usb kernel-install add $kernel_version /lib/modules/$kernel_version/vmlinuz
     echo "### Setting systemd-boot timeout value"
-    sed -i 's/#timeout.*$/timeout 1/' $mnt_usb/efi/loader/loader.conf
+    sed -i 's/#timeout.*$/timeout 3/' $mnt_usb/efi/loader/loader.conf
 
     # adding a small delay prevents this error msg from polluting the console
     # device (wlan0): interface index 2 renamed iface from 'wlan0' to 'wlp1s0f0'
