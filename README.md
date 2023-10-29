@@ -71,7 +71,7 @@ Which are useful if you have Fedora installed on the internal drive:
 /usr/local/sbin/chroot.asahi
 /usr/local/sbin/umount.asahi
 ```
-1. `chroot.asahi` will mount the (Fedora) internal drive under `/mnt` and will `arch-chroot` into it.
+1. `chroot.asahi` will mount the (Fedora) internal drive under `/mnt` and will `arch-chroot` into it.  
 To exit from the `chroot` environment, simply type `ctrl+d` or `exit`
 
 2. `umount.asahi` will unmount the internal drive from `/mnt`
