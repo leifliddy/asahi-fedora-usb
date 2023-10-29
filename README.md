@@ -65,7 +65,7 @@ An actual example:
 
 **Rescuing a Fedora install**
 
-Two helper scripts have been added to this image
+Two helper scripts have been added to this image  
 Which are useful if you have Fedora installed on the internal drive:
 ```
 /usr/local/sbin/chroot.asahi
