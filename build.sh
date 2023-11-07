@@ -96,6 +96,26 @@ wipe_usb() {
 }
 
 # ./build.sh mount
+# ./build.sh umount
+# ./build chroot
+#  to mount, unmount, or chroot into the usb drive (that was previously created by this script)
+if [[ $1 == 'mount' ]]; then
+    mount_usb
+    exit
+elif [[ $1 == 'umount' ]] || [[ $1 == 'unmount' ]]; then
+    umount_usb
+    exit
+elif [[ $1 == 'chroot' ]]; then
+    mountusb
+    echo "### Chrooting into $mnt_usb"
+    arch-chroot $mnt_usb
+    exit
+elif [[ -n $1 ]]; then
+    echo "$1 isn't a recogized option"
+    exit
+fi
+
+# ./build.sh mount
 #  or
 # ./build.sh umount
 #  to mount or unmount a usb drive (that was previously created by this script) to/from mnt_usb/
