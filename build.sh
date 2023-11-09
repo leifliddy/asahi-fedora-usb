@@ -32,6 +32,7 @@ do
     esac
 done
 
+shift "$((OPTIND-1))"
 
 mount_usb() {
     # mounts an existing usb drive to mnt_usb/ so you can inspect the contents or chroot into it...etc
