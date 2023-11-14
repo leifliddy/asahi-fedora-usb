@@ -60,14 +60,14 @@ mount_usb() {
 }
 
 umount_usb() {
-    # if usb_device is specified then ensure all partition from the drive are unmounted
+    # if $usb_device is specified then ensure all partitions from the drive are unmounted
     # this is needed for new usb devices and for systems that auto-mount usb devices
-	if [[ -n $usb_device ]]; then
-		for partition in ${usb_device}?*; do
-			 [[ -n "$(findmnt -n $partition)" ]] && umount $partition
-		done
-		return 0
-	fi
+    if [[ -n $usb_device ]]; then
+        for partition in ${usb_device}?*; do
+            [[ -n "$(findmnt -n $partition)" ]] && umount $partition
+        done
+        return 0
+    fi
 
     # umounts usb drive from mnt_usb/
     echo '### Checking to see if usb drive is mounted to mnt_usb'
