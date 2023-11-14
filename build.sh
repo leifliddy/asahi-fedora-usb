@@ -218,6 +218,9 @@ install_usb() {
     rm -rf $mnt_usb/image.creation
     rm -f  $mnt_usb/etc/dracut.conf.d/initial-boot.conf
     rm -f  $mnt_usb/etc/yum.repos.d/mkosi*.repo
+    # not sure how/why a $mnt_usb/root/asahi-fedora-usb directory is being created
+    # remove it like this to account for it being named something different
+    find $mnt_usb/root/ -maxdepth 1 -mindepth 1 -type d | grep -Ev '/\..*$' | xargs rm -rf
 
     echo '### Unmounting usb partitions'
     umount $mnt_usb/boot/efi
