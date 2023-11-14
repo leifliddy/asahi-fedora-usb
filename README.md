@@ -37,8 +37,8 @@ To boot the usb drive on an apple silicon system, you could either:
 env set boot_efi_bootmgr
 run usb_boot
 ```
-2. Add the usb drive to the grub menu on the internal drive
-You just need to boot Linux on the internal drive, plugin the usb drive, and then update grub
+2. Add the usb drive to the grub menu on the internal drive  
+You just need to boot Linux on the **internal drive**, plugin the usb drive, and then update grub
 ```
 [root@m1 ~]# grub2-mkconfig -o /boot/grub2/grub.cfg
 Generating grub configuration file ...
@@ -46,9 +46,9 @@ Found Fedora Linux Asahi Remix 38 (Thirty Eight) on /dev/nvme0n1p6
 Found Fedora Linux Asahi Remix 38 (Thirty Eight) on /dev/sda3
 done
 ```
-You should now see the `/dev/sda3` entry in the main grub menu
+You should now see the `/dev/sda3` entry in the main grub menu  
 If you don't see the grub menu at all or if the text is garbled, then ensure these options are set in `/etc/default/grub`
-and run `grub2-mkconfig -o /boot/grub2/grub.cfg` afterwards
+and then run `grub2-mkconfig -o /boot/grub2/grub.cfg` on the internal drive
 ```
 GRUB_TIMEOUT=5
 GRUB_TIMEOUT_STYLE="menu"
