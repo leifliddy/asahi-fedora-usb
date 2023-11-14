@@ -1,9 +1,3 @@
-images
-mkosi.rootfs
-mkosi.rootfs.manifest
-.mkosi*
+mkosi.cache
+mkosi.output
 mnt_usb
-asahi-linux.repo
-firmware.tar
-manifest.txt
-all_firmware.tar.gz

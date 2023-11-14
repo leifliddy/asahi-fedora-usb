@@ -1,6 +1,3 @@
-**Note** there is currently an issue building a usb drive with this project (ie it doesn't work) -- I will address this later this week (as I'm on leave atm)....
-
-
 Creates a Fedora usb drive that will boot on Apple M1/M2 systems.
 
 **Fedora package install:**
