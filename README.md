@@ -24,10 +24,11 @@ If you've previously installed this Fedora image to the usb drive, you can wipe 
 ./build.sh -wd /dev/sda
 ```
 
-Once the drive is created, you can locally mount and unmount the usb drive (which contains 3 partitions) to/from ```mnt_usb/``` with
+Once the drive is created, you can locally moun, unmount, or chroot into the usb drive (which contains 3 partitions) to/from ```mnt_usb/``` with
 ```
 ./build.sh mount
 ./build.sh umount
+./build.sh chroot
 ```
 **note:** mounting the usb drive is useful for inspecting the contents of the drive or making changes to it
 
