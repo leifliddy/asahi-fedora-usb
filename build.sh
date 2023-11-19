@@ -154,7 +154,6 @@ prepare_usb_device() {
 
 mkosi_create_rootfs() {
     mkosi clean
-    rm -rf .mkosi*
     mkosi
 }
 
