@@ -2,13 +2,16 @@
 
 set -e
 
-mkosi_rootfs='mkosi.output/mkosi.rootfs'
+mkosi_output='mkosi.output'
+mkosi_rootfs="$mkosi_output/image"
+mkosi_cache='mkosi.cache'
 mnt_usb='mnt_usb'
+mnt_usb="$(pwd)/mnt_usb"
+
 
 EFI_UUID='3051-D434'
 BOOT_UUID='a1492762-3fe2-4908-a8b9-118439becd26'
 ROOT_UUID='d747cb2a-aff1-4e47-8a33-c4d9b7475df9'
-
 
 if [ "$(whoami)" != 'root' ]; then
     echo "You must be root to run this script."
@@ -16,9 +19,8 @@ if [ "$(whoami)" != 'root' ]; then
 fi
 
 [ ! -d $mnt_usb ] && mkdir $mnt_usb
-[ ! -d mkosi.cache ] && mkdir mkosi.cache
-[ ! -d mkosi.output ] && mkdir mkosi.output
-[ ! -d mnt_usb ] && mkdir mnt_usb
+[ ! -d $mkosi_output ] && mkdir $mkosi_output
+[ ! -d $mkosi_cache ] && mkdir $mkosi_cache
 
 # specify the usb device with the -d argument
 while getopts :d:w arg
@@ -36,7 +38,6 @@ shift "$((OPTIND-1))"
 
 mount_usb() {
     # mounts an existing usb drive to mnt_usb/ so you can inspect the contents or chroot into it...etc
-    echo '### Mounting usb partitions'
     systemctl daemon-reload
     sleep 1
     # first try to mount the usb partitions via their uuid
@@ -112,9 +113,11 @@ wipe_usb() {
 # ./build chroot
 #  to mount, unmount, or chroot into the usb drive (that was previously created by this script) to/from mnt_usb
 if [[ $1 == 'mount' ]]; then
+    echo "### Mounting to $mnt_usb"
     mount_usb
     exit
 elif [[ $1 == 'umount' ]] || [[ $1 == 'unmount' ]]; then
+    echo "### Umounting from $mnt_usb"
     umount_usb
     exit
 elif [[ $1 == 'chroot' ]]; then
@@ -153,6 +156,7 @@ prepare_usb_device() {
 }
 
 mkosi_create_rootfs() {
+    umount_usb
     mkosi clean
     mkosi
 }
