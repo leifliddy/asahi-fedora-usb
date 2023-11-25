@@ -3,13 +3,16 @@ Creates a Fedora usb drive that will boot on Apple M1/M2 systems.
 ## Fedora Package Install
 ```dnf install arch-install-scripts bubblewrap gdisk mkosi qemu-user-static pandoc rsync systemd-container```
 
-### Notes
+#### Notes
 
-- ```qemu-user-static``` is only needed if building the image on a ```non-aarch64``` system  
-- If building the image on a **Fedora 38** system install mkosi v18:  
-  `python3 -m pip install --user git+https://github.com/systemd/mkosi.git@v18`
-- If building the image on a **Fedora 39** system you need to install mkosi from main:  
-  `python3 -m pip install --user git+https://github.com/systemd/mkosi.git`
+- The root password is **fedora**  
+- The ```qemu-user-static``` package is needed if building the image on a ```non-aarch64``` system  
+- This project is based on `mkosi v19` which matches the current version of `mkosi` in the `F39` repo  
+  https://src.fedoraproject.org/rpms/mkosi/  
+  However....`mkosi` is updated so quickly that it's difficult to keep up at times (I have several projects based on `mkosi`)  
+  I'll strive to keep things updated to the latest version supported in Fedora  
+  If needed, you can always install a specific version via pip  
+  `python3 -m pip install --user git+https://github.com/systemd/mkosi.git@v19`
 
 
 To build a minimal Fedora image and install it to a usb drive, simply run:
