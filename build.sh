@@ -18,7 +18,7 @@ fi
 [ ! -d $mnt_usb ] && mkdir $mnt_usb
 [ ! -d mkosi.cache ] && mkdir mkosi.cache
 [ ! -d mkosi.output ] && mkdir mkosi.output
-[ ! -d mnt_image ] && mkdir mnt_image
+[ ! -d mnt_usb ] && mkdir mnt_usb
 
 # specify the usb device with the -d argument
 while getopts :d:w arg
