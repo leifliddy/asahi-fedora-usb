@@ -5,7 +5,6 @@ set -e
 mkosi_output='mkosi.output'
 mkosi_rootfs="$mkosi_output/image"
 mkosi_cache='mkosi.cache'
-mnt_usb='mnt_usb'
 mnt_usb="$(pwd)/mnt_usb"
 
 
