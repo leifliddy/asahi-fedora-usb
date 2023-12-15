@@ -1,7 +1,7 @@
 Creates a Fedora usb drive that will boot on Apple M1/M2 systems.
 
 ## Fedora Package Install
-```dnf install arch-install-scripts bubblewrap gdisk mkosi qemu-user-static pandoc rsync systemd-container```
+```dnf install arch-install-scripts bubblewrap gdisk mkosi pandoc rsync systemd-container```
 
 #### Notes
 
