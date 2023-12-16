@@ -1,4 +1,4 @@
-Creates a Fedora usb drive that will boot on Apple M1/M2 systems.
+Creates a Fedora usb drive that will boot on Apple Silicon systems.
 
 ## Fedora Package Install
 ```dnf install arch-install-scripts bubblewrap gdisk mkosi pandoc rsync systemd-container```
