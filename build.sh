@@ -101,8 +101,9 @@ umount_usb() {
 
 wipe_usb() {
     # wipe the contents of the usb drive to avoid having to repartition it
-
     # first check if the partitions exist
+    umount_usb
+
     if [ $(blkid | grep -Ei "$EFI_UUID|$BOOT_UUID|$ROOT_UUID" | wc -l) -eq 3 ]; then
         [[ -z "$(findmnt -n $mnt_usb)" ]] && mount -U $ROOT_UUID $mnt_usb
         if [ -e $mnt_usb/boot ]; then
