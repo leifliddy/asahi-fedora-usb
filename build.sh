@@ -38,7 +38,6 @@ shift "$((OPTIND-1))"
 [[ -z $usb_device ]] && echo "usage ./build -d [usb_device]" && exit
 [[ -n $usb_device ]] && [[ ! -b $usb_device ]] && echo $usb_device is not a block device && exit
 
-
 check_mkosi() {
     mkosi_cmd=$(command -v mkosi || true)
     [[ -z $mkosi_cmd ]] && echo 'mkosi is not installed...exiting' && exit
