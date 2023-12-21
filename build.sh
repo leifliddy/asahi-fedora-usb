@@ -217,11 +217,6 @@ install_usb() {
     chroot $mnt_usb chmod -x /etc/grub.d/30_uefi-firmware
     arch-chroot $mnt_usb grub2-mkconfig -o /boot/grub2/grub.cfg
 
-    # adding a small delay prevents this error msg from polluting the console
-    # device (wlan0): interface index 2 renamed iface from 'wlan0' to 'wlp1s0f0'
-    echo "### Adding delay to NetworkManager.service"
-    sed -i '/ExecStart=.*$/iExecStartPre=/usr/bin/sleep 2' $mnt_usb/usr/lib/systemd/system/NetworkManager.service
-
     echo "### Enabling system services"
     arch-chroot $mnt_usb systemctl enable NetworkManager sshd systemd-resolved
 
