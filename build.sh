@@ -35,7 +35,6 @@ done
 
 shift "$((OPTIND-1))"
 
-[[ -z $usb_device ]] && echo "usage ./build -d [usb_device]" && exit
 [[ -n $usb_device ]] && [[ ! -b $usb_device ]] && echo $usb_device is not a block device && exit
 
 check_mkosi() {
@@ -98,7 +97,7 @@ umount_usb() {
     [[ "$(findmnt -n $mnt_usb)" ]] && umount $mnt_usb
 }
 
-wipe_usb() {
+wipe_usb() {m
     # wipe the contents of the usb drive to avoid having to repartition it
     # first check if the partitions exist
     umount_usb
@@ -146,7 +145,7 @@ elif [[ -n $1 ]]; then
     echo "$1 isn't a recogized option"
 fi
 
-[[ -z $usb_device ]] && echo -e "\nyou must specify a usb device ie\n./build.sh -d /dev/sda\n" && exit
+[[ -z $usb_device ]] && echo "usage ./build -d [usb_device] || ./build {mount,umount,chroot}" && exit
 [[ ! -e $usb_device ]] && echo -e "\n$usb_device doesn't exist\n" && exit
 
 
