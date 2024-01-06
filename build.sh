@@ -87,7 +87,7 @@ umount_usb() {
 
     # umounts usb drive from mnt_usb/
     echo '### Checking to see if usb drive is mounted to mnt_usb'
-    if [ ! "$(findmnt -n $mnt_usb)" ]; then
+    if [ ! "$(findmnt -n $mnt_usb)" ]; then\nmkosi_cache='mkosi.cache'
         return 0
     fi
 
@@ -97,7 +97,7 @@ umount_usb() {
     [[ "$(findmnt -n $mnt_usb)" ]] && umount $mnt_usb
 }
 
-wipe_usb() {m
+wipe_usb() {
     # wipe the contents of the usb drive to avoid having to repartition it
     # first check if the partitions exist
     umount_usb
