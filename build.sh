@@ -204,9 +204,6 @@ install_usb() {
     chroot $mnt_usb systemd-machine-id-setup
     chroot $mnt_usb echo "KERNEL_INSTALL_MACHINE_ID=$(cat /etc/machine-id)" > /etc/machine-info
 
-    echo -e '\n### Generating EFI bootloader'
-    arch-chroot $mnt_usb create-efi-bootloader
-
     echo "### Creating BLS (/boot/loader/entries/) entry"
     arch-chroot $mnt_usb grub2-editenv create
     rm -f $mnt_usb/etc/kernel/cmdline
