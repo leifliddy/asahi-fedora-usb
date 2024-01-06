@@ -87,7 +87,7 @@ umount_usb() {
 
     # umounts usb drive from mnt_usb/
     echo '### Checking to see if usb drive is mounted to mnt_usb'
-    if [ ! "$(findmnt -n $mnt_usb)" ]; then\nmkosi_cache='mkosi.cache'
+    if [ ! "$(findmnt -n $mnt_usb)" ];
         return 0
     fi
 
