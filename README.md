@@ -46,8 +46,8 @@ You just need to boot Linux on the **internal drive**, plugin the usb drive, and
 ```
 [root@m1 ~]# grub2-mkconfig -o /boot/grub2/grub.cfg
 Generating grub configuration file ...
-Found Fedora Linux Asahi Remix 38 (Thirty Eight) on /dev/nvme0n1p6
-Found Fedora Linux Asahi Remix 38 (Thirty Eight) on /dev/sda3
+Found Fedora Linux Asahi Remix 39 (Thirty Nine) on /dev/nvme0n1p6
+Found Fedora Linux Asahi Remix 39 (Thirty Nine) on /dev/sda3
 done
 ```
 You should now see the `/dev/sda3` entry in the main grub menu  
