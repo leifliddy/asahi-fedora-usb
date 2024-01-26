@@ -7,12 +7,12 @@ Creates a Fedora usb drive that will boot on Apple Silicon systems.
 
 - The root password is **fedora**  
 - The ```qemu-user-static``` package is needed if building the image on a ```non-aarch64``` system  
-- This project is based on `mkosi v19` which matches the current version of `mkosi` in the `F39` repo  
+- This project is based on `mkosi v20` which matches the current version of `mkosi` in the `F39` repo  
   https://src.fedoraproject.org/rpms/mkosi/  
   However....`mkosi` is updated so quickly that it's difficult to keep up at times (I have several projects based on `mkosi`)  
   I'll strive to keep things updated to the latest version supported in Fedora  
   If needed, you can always install a specific version via pip  
-  `python3 -m pip install --user git+https://github.com/systemd/mkosi.git@v19`
+  `python3 -m pip install --user git+https://github.com/systemd/mkosi.git@v20`
 
 
 To build a minimal Fedora image and install it to a usb drive, simply run:

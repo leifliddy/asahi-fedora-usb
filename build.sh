@@ -6,7 +6,7 @@ mkosi_output='mkosi.output'
 mkosi_rootfs="$mkosi_output/image"
 mkosi_cache='mkosi.cache'
 mnt_usb="$(pwd)/mnt_usb"
-mkosi_supported_version=19
+mkosi_supported_version=20
 
 EFI_UUID='3051-D434'
 BOOT_UUID='a1492762-3fe2-4908-a8b9-118439becd26'
@@ -40,7 +40,7 @@ shift "$((OPTIND-1))"
 check_mkosi() {
     mkosi_cmd=$(command -v mkosi || true)
     [[ -z $mkosi_cmd ]] && echo 'mkosi is not installed...exiting' && exit
-    mkosi_version=$(mkosi --version | awk '{print $2}')
+    mkosi_version=$(mkosi --version | awk '{print $2}' | sed 's/\..*$//')
 
     if [[ $mkosi_version -ne $mkosi_supported_version ]]; then
         echo "mkosi path:    $mkosi_cmd"
@@ -186,11 +186,9 @@ install_usb() {
     rsync -aHAX --delete --exclude '/tmp/*' --exclude '/boot/*' --exclude '/efi' $mkosi_rootfs/ $mnt_usb
     mount -U $BOOT_UUID $mnt_usb/boot
     rsync -aHAX --delete $mkosi_rootfs/boot/ $mnt_usb/boot
-    # mkosi >=v18 creates the following symlink in /boot: efi -> ../efi
-    [[ -L $mnt_usb/boot/efi ]] && rm -f $mnt_usb/boot/efi && mkdir $mnt_usb/boot/efi
     mount -U $EFI_UUID $mnt_usb/boot/efi
-    echo "rsync -aH $mkosi_rootfs/efi/ $mnt_usb/boot/efi"
-    rsync -aH $mkosi_rootfs/efi/ $mnt_usb/boot/efi
+    echo "rsync -aH $mkosi_rootfs/boot/efi/ $mnt_usb/boot/efi"
+    rsync -aH $mkosi_rootfs/boot/efi/ $mnt_usb/boot/efi
     echo '### Setting uuids for partitions in /etc/fstab'
     sed -i "s/EFI_UUID_PLACEHOLDER/$EFI_UUID/" $mnt_usb/etc/fstab
     sed -i "s/BOOT_UUID_PLACEHOLDER/$BOOT_UUID/" $mnt_usb/etc/fstab
