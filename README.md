@@ -57,7 +57,6 @@ and then run `grub2-mkconfig -o /boot/grub2/grub.cfg` on the internal drive
 GRUB_TIMEOUT=5
 GRUB_TIMEOUT_STYLE="menu"
 GRUB_TERMINAL_OUTPUT="gfxterm"
-GRUB_FONT=/boot/grub2/fonts/unicode.pf2
 ```
 
 **Setting up WiFi**
