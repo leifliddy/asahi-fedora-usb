@@ -247,6 +247,6 @@ check_mkosi
 # and the disk partitions already exist (from a previous install)
 # then remove the files from disk vs repartitioning it
 [[ $wipe = true ]] && wipe_usb || prepare_usb_device
-[[ $(command -v getenforce) ]] && [[ $(getenforce | grep -Ei 'Enforcing|Permissive') ]] && setenforce 0
+[[ $(command -v getenforce) ]] && [[ $(getenforce | grep 'Enforcing') ]] && setenforce 0
 mkosi_create_rootfs
 install_usb
