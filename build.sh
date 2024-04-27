@@ -6,7 +6,7 @@ mkosi_output='mkosi.output'
 mkosi_rootfs="$mkosi_output/image"
 mkosi_cache='mkosi.cache'
 mnt_usb="$(pwd)/mnt_usb"
-mkosi_supported_version=20
+mkosi_supported_version=22
 
 EFI_UUID='3051-D434'
 BOOT_UUID='a1492762-3fe2-4908-a8b9-118439becd26'
