@@ -180,7 +180,7 @@ mkosi_create_rootfs() {
 install_usb() {
     umount_usb
     echo '### Cleaning up'
-    rm -f $mkosi_rootfs/var/cache/dnf/*
+    rm -fr $mkosi_rootfs/var/cache/dnf/*
     echo '### Mounting usb partitions and copying files'
     mount -U $ROOT_UUID $mnt_usb
     rsync -aHAX --exclude '/tmp/*' --exclude '/boot/*' --exclude '/efi' $mkosi_rootfs/ $mnt_usb
