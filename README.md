@@ -35,8 +35,7 @@ Once the drive is created, you can locally mount, unmount, or chroot into the us
 ```
 **note:** mounting the usb drive is useful for inspecting the contents of the drive or making changes to it
 
-To boot the usb drive on an apple silicon system, just insert the usb drive and boot  
-`u-boot` should auto-boot the drive  
+To boot the usb drive, type `bootmenu` at the `u-boot` prompt and select the usb drive  
 
 **Setting up WiFi**
 
