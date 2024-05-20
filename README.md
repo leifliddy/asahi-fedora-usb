@@ -1,7 +1,7 @@
 Creates a Fedora usb drive that will boot on Apple M-series systems
 
 ## Fedora Package Install
-```dnf install arch-install-scripts bubblewrap gdisk mkosi pandoc rsync systemd-container```
+```dnf install arch-install-scripts bubblewrap dosfstools e2fsprogs gdisk mkosi openssl pandoc rsync systemd-container```
 
 #### Notes
 
