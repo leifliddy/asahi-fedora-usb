@@ -14,9 +14,11 @@ ROOT_UUID='d747cb2a-aff1-4e47-8a33-c4d9b7475df9'
 
 if [ "$(whoami)" != 'root' ]; then
     echo "You must be root to run this script"
+    echo "Try \`sudo su -\` before running this script"
     exit
 elif [[ -n $SUDO_USER ]] && [[ $SUDO_USER != 'root' ]]; then
     echo "You must run this script as root and not with sudo"
+    echo "Try \`sudo su -\` before running this script"
     exit
 fi
 
