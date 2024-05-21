@@ -217,10 +217,7 @@ install_usb() {
 
     echo "### Enabling system services"
     arch-chroot $mnt_usb systemctl enable NetworkManager sshd systemd-resolved
-if [[ $(command -v getenforce) ]] && [[ "$(getenforce)" = "Enforcing" ]]; then
-    setenforce 0
-    trap 'setenforce 1; exit;' EXIT SIGHUP SIGINT SIGTERM SIGQUIT SIGABRT
-fi
+    
     echo "### Disabling systemd-firstboot"
     chroot $mnt_usb rm -f /usr/lib/systemd/system/sysinit.target.wants/systemd-firstboot.service
 
