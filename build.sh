@@ -225,6 +225,10 @@ install_usb() {
     arch-chroot $mnt_usb setfiles -F -p -c /etc/selinux/targeted/policy/policy.* -e /proc -e /sys -e /dev /etc/selinux/targeted/contexts/files/file_contexts /
     arch-chroot $mnt_usb setfiles -F -p -c /etc/selinux/targeted/policy/policy.* -e /proc -e /sys -e /dev /etc/selinux/targeted/contexts/files/file_contexts /boot
 
+    echo "### Fix sdhci_pci problem"
+    arch-chroot $mnt_usb systemd-hwdb update
+    arch-chroot $mnt_usb dracut --regenerate-all --force
+
     ###### post-install cleanup ######
     echo -e '\n### Cleanup'
     rm -f  $mnt_usb/etc/kernel/{entry-token,install.conf}
