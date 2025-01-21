@@ -35,7 +35,12 @@ Once the drive is created, you can locally mount, unmount, or chroot into the us
 ```
 **note:** mounting the usb drive is useful for inspecting the contents of the drive or making changes to it
 
-To boot the usb drive, type `bootmenu` at the `u-boot` prompt and select the usb drive  
+To boot the usb drive, type `bootmenu` at the `u-boot` prompt and select the usb drive  ie `Usb 0`
+
+<img src=https://github.com/user-attachments/assets/2da031eb-c0e6-4a52-a3b9-61476dc50d32 width="100" height="100">
+<img src=https://github.com/user-attachments/assets/090f5938-a547-46b3-bcd0-9ea30f575555 width="100" height="100">
+
+
 
 **Setting up WiFi**
 
