@@ -1,4 +1,4 @@
-Creates a Fedora usb drive that will boot on Apple M-series systems
+Creates a Fedora usb drive that will boot on Apple M-series systems (that have Asahi Linux installed on the internal hard drive!!!)
 
 ## Fedora Package Install
 ```dnf install arch-install-scripts bubblewrap dosfstools e2fsprogs gdisk mkosi openssl pandoc rsync systemd-container```
