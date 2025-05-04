@@ -6,7 +6,7 @@ mkosi_output='mkosi.output'
 mkosi_rootfs="$mkosi_output/image"
 mkosi_cache='mkosi.cache'
 mnt_usb="$(pwd)/mnt_usb"
-mkosi_supported_version=24
+mkosi_max_supported_version=23
 
 EFI_UUID='3051-D434'
 BOOT_UUID='a1492762-3fe2-4908-a8b9-118439becd26'
@@ -44,11 +44,11 @@ check_mkosi() {
     [[ -z $mkosi_cmd ]] && echo 'mkosi is not installed...exiting' && exit
     mkosi_version=$(mkosi --version | awk '{print $2}' | sed 's/\..*$//')
 
-    if [[ $mkosi_version -ne $mkosi_supported_version ]]; then
+    if [[ $mkosi_version -gt $mkosi_max_supported_version ]]; then
         echo "mkosi path:    $mkosi_cmd"
         echo "mkosi version: $mkosi_version"
-        echo -e "\nthis project was built with mkosi version $mkosi_supported_version"
-        echo "please install that version to continue"
+        echo -e "\nOnly mkosi version $mkosi_max_supported_version and below are supported"
+        echo "please install a compatible version to continue"
         exit
     fi
 }
@@ -222,8 +222,10 @@ install_usb() {
     chroot $mnt_usb rm -f /usr/lib/systemd/system/sysinit.target.wants/systemd-firstboot.service
 
     echo "### SElinux labeling filesystem"
-    arch-chroot $mnt_usb setfiles -F -p -c /etc/selinux/targeted/policy/policy.* -e /proc -e /sys -e /dev /etc/selinux/targeted/contexts/files/file_contexts /
-    arch-chroot $mnt_usb setfiles -F -p -c /etc/selinux/targeted/policy/policy.* -e /proc -e /sys -e /dev /etc/selinux/targeted/contexts/files/file_contexts /boot
+    policy=$(ls -tr  $mnt_usb/etc/selinux/targeted/policy/ | tail -1)
+
+    arch-chroot $mnt_usb setfiles -F -p -c /etc/selinux/targeted/policy/$policy -e /proc -e /sys -e /dev /etc/selinux/targeted/contexts/files/file_contexts /
+    arch-chroot $mnt_usb setfiles -F -p -c /etc/selinux/targeted/policy/$policy -e /proc -e /sys -e /dev /etc/selinux/targeted/contexts/files/file_contexts /boot
 
     ###### post-install cleanup ######
     echo -e '\n### Cleanup'
