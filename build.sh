@@ -6,20 +6,23 @@ mkosi_output='mkosi.output'
 mkosi_rootfs="$mkosi_output/image"
 mkosi_cache='mkosi.cache'
 mnt_usb="$(pwd)/mnt_usb"
-mkosi_max_supported_version=23
+mkosi_supported_version=25
 
 EFI_UUID='3051-D434'
 BOOT_UUID='a1492762-3fe2-4908-a8b9-118439becd26'
 ROOT_UUID='d747cb2a-aff1-4e47-8a33-c4d9b7475df9'
 
+# public dns server address -- will be used when chrooting into the rootfs and running dnf
+DNS='8.8.8.8'
+
 if [ "$(whoami)" != 'root' ]; then
-    echo "You must be root to run this script"
-    echo "Try \`sudo su -\` before running this script"
-    exit
+echo "You must be root to run this script"
+echo "Try \`sudo su -\` before running this script"
+exit
 elif [[ -n $SUDO_USER ]] && [[ $SUDO_USER != 'root' ]]; then
-    echo "You must run this script as root and not with sudo"
-    echo "Try \`sudo su -\` before running this script"
-    exit
+echo "You must run this script as root and not with sudo"
+echo "Try \`sudo su -\` before running this script"
+exit
 fi
 
 [ ! -d $mnt_usb ] && mkdir $mnt_usb
@@ -29,10 +32,10 @@ fi
 # specify the usb device with the -d argument
 while getopts :d:w arg
 do
-    case "${arg}" in
-        d) usb_device=${OPTARG};;
-        w) wipe=true;;
-    esac
+case "${arg}" in
+d) usb_device=${OPTARG};;
+w) wipe=true;;
+esac
 done
 
 shift "$((OPTIND-1))"
@@ -44,11 +47,11 @@ check_mkosi() {
     [[ -z $mkosi_cmd ]] && echo 'mkosi is not installed...exiting' && exit
     mkosi_version=$(mkosi --version | awk '{print $2}' | sed 's/\..*$//')
 
-    if [[ $mkosi_version -gt $mkosi_max_supported_version ]]; then
+    if [[ $mkosi_version -ne $mkosi_supported_version ]]; then
         echo "mkosi path:    $mkosi_cmd"
         echo "mkosi version: $mkosi_version"
-        echo -e "\nOnly mkosi version $mkosi_max_supported_version and below are supported"
-        echo "please install a compatible version to continue"
+        echo -e "\nthis project was built with mkosi version $mkosi_supported_version.x"
+        echo "please install that version to continue"
         exit
     fi
 }
@@ -71,9 +74,11 @@ mount_usb() {
             echo -e "\ntherefore you must specify the usb device ie\n./build.sh -d /dev/sda mount\n"
             exit
         fi
+
         [[ -z "$(findmnt -n $mnt_usb)" ]] && mount "$usb_device"3 $mnt_usb
         [[ -z "$(findmnt -n $mnt_usb/boot)" ]] && mount "$usb_device"2 $mnt_usb/boot
         [[ -z "$(findmnt -n $mnt_usb/boot/efi)" ]] && mount "$usb_device"1 $mnt_usb/boot/efi
+
     fi
 }
 
@@ -81,9 +86,11 @@ umount_usb() {
     # if $usb_device is specified then ensure all partitions from the drive are unmounted
     # this is needed for new usb devices and for systems that auto-mount usb devices
     if [[ -n $usb_device ]]; then
+
         for partition in ${usb_device}?*; do
             [[ -n "$(findmnt -n $partition)" ]] && umount $partition
         done
+
         return 0
     fi
 
@@ -109,6 +116,7 @@ wipe_usb() {
         if [ -e $mnt_usb/boot ]; then
             [[ -z "$(findmnt -n $mnt_usb/boot)" ]] && mount -U $BOOT_UUID $mnt_usb/boot
         fi
+
         if [ -e $mnt_usb/boot/efi ]; then
             [[ -z "$(findmnt -n $mnt_usb/boot/efi)" ]] && mount -U $EFI_UUID $mnt_usb/boot/efi
         fi
@@ -125,31 +133,6 @@ wipe_usb() {
     [[ "$(findmnt -n $mnt_usb/boot)" ]] && rm -rf $mnt_usb/boot/* && umount $mnt_usb/boot
     [[ "$(findmnt -n $mnt_usb)" ]] && rm -rf $mnt_usb/* && umount $mnt_usb
 }
-
-# ./build.sh mount
-# ./build.sh umount
-# ./build chroot
-#  to mount, unmount, or chroot into the usb drive (that was previously created by this script) to/from mnt_usb
-if [[ $1 == 'mount' ]]; then
-    echo "### Mounting to $mnt_usb"
-    mount_usb
-    exit
-elif [[ $1 == 'umount' ]] || [[ $1 == 'unmount' ]]; then
-    echo "### Umounting from $mnt_usb"
-    umount_usb
-    exit
-elif [[ $1 == 'chroot' ]]; then
-    mount_usb
-    echo "### Chrooting into $mnt_usb"
-    arch-chroot $mnt_usb
-    exit
-elif [[ -n $1 ]]; then
-    echo "$1 isn't a recogized option"
-fi
-
-[[ -z $usb_device ]] && echo "usage ./build -d [usb_device] || ./build {mount,umount,chroot}" && exit
-[[ ! -e $usb_device ]] && echo -e "\n$usb_device doesn't exist\n" && exit
-
 
 prepare_usb_device() {
     umount_usb
@@ -177,6 +160,15 @@ mkosi_create_rootfs() {
     umount_usb
     mkosi clean
     mkosi
+}
+
+rootfs_operations() {
+
+    rm -f $mkosi_rootfs/etc/resolv.conf
+    echo "nameserver $DNS" > $mkosi_rootfs/etc/resolv.conf
+
+    arch-chroot $mkosi_rootfs dnf install -y asahi-platform-metapackage
+
 }
 
 install_usb() {
@@ -217,7 +209,7 @@ install_usb() {
 
     echo "### Enabling system services"
     arch-chroot $mnt_usb systemctl enable NetworkManager sshd systemd-resolved
-    
+
     echo "### Disabling systemd-firstboot"
     chroot $mnt_usb rm -f /usr/lib/systemd/system/sysinit.target.wants/systemd-firstboot.service
 
@@ -248,6 +240,31 @@ install_usb() {
     echo '### Done'
 }
 
+# ./build.sh mount
+# ./build.sh umount
+# ./build chroot
+#  to mount, unmount, or chroot into the usb drive (that was previously created by this script) to/from mnt_usb
+if [[ $1 == 'mount' ]]; then
+    echo "### Mounting to $mnt_usb"
+    mount_usb
+    exit
+elif [[ $1 == 'umount' ]] || [[ $1 == 'unmount' ]]; then
+    echo "### Umounting from $mnt_usb"
+    umount_usb
+    exit
+elif [[ $1 == 'chroot' ]]; then
+    mount_usb
+    echo "### Chrooting into $mnt_usb"
+    arch-chroot $mnt_usb
+    exit
+elif [[ -n $1 ]]; then
+    echo "$1 isn't a recogized option"
+fi
+
+[[ -z $usb_device ]] && echo "usage ./build -d [usb_device] || ./build {mount,umount,chroot}" && exit
+[[ ! -e $usb_device ]] && echo -e "\n$usb_device doesn't exist\n" && exit
+
+
 check_mkosi
 # if -w argument is specified
 # ie
@@ -262,4 +279,5 @@ if [[ $(command -v getenforce) ]] && [[ "$(getenforce)" = "Enforcing" ]]; then
 fi
 
 mkosi_create_rootfs
+rootfs_operations
 install_usb
