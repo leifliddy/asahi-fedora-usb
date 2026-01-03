@@ -32,11 +32,6 @@ Once the drive is created, you can locally mount, unmount, or chroot into the us
 ```
 **note:** mounting the usb drive is useful for inspecting the contents of the drive or making changes to it
 
-To boot the usb drive, type `bootmenu` at the `u-boot` prompt and select the usb drive  ie `Usb 0`
-
-<img src=https://github.com/user-attachments/assets/2da031eb-c0e6-4a52-a3b9-61476dc50d32 width="100" height="100">
-<img src=https://github.com/user-attachments/assets/090f5938-a547-46b3-bcd0-9ea30f575555 width="100" height="100">
-
 
 
 **Setting up WiFi**
@@ -59,3 +54,53 @@ Which are useful if you have Fedora installed on the internal drive:
 To exit from the `chroot` environment, simply type `ctrl+d` or `exit`
 
 2. `umount.asahi` will unmount the internal drive from `/mnt`
+
+
+
+**Booting the USB drive**  
+
+There are two methods (that I use) to boot a usb drive: **u-boot eficonfig** and **modifying the grub config**
+
+1. **u-boot eficonfig**  
+   Power on the system while the usb drive is connected.
+
+type eficonfig at the u-boot prompt
+
+
+<img src=https://github.com/user-attachments/assets/9e9aceee-07d5-430c-929e-56149f016748 width="100" height="100">
+
+then go to "Change Boot Order"
+
+
+<img src=https://github.com/user-attachments/assets/ff262948-9f1b-4b92-95af-aba1942ae5e3 width="100" height="100">
+
+
+Now change the boot order.  
+I would check `usb0` as well as the First `Fedora` entry.  
+**note:** to get `usb0` on the top (like in the pic). I deselected everything except for `usb0` and hit Save.  
+I then went back to "Change Boot Order" (this time usb0 was on top) and selected `Fedora`  
+I'm pretty sure that you need `usb0` to be on top.  
+
+
+<img src=https://github.com/user-attachments/assets/83472294-bcf4-48dd-b7e0-9e634f7ca937 width="100" height="100">
+
+
+From here, simply hit `Save`, then `Quit` (you could also hit the escape key twice).
+This will bring you back to the `u-boot` prompt.  
+From the `u-boot prompt`: simply type `run bootcmd` or `bootd` to boot the system. 
+
+
+<img src=https://github.com/user-attachments/assets/a4759bb8-4eea-4566-bc92-dab7bf84ee97 width="100" height="100">
+
+You should now be presented with the grub menu of the usb drive. What "should" happen at this point is that  
+if you boot with the usb drive connnected, the usb drive should boot. If usb drive is disconnected, the system should   
+boot from the internal drive. 
+
+2. **modifying the grub config** (on the internal drive)
+   This couldn't be easier.
+   After creating the usb drive, ensure the usb drive is plugged in and run:  
+   `grub2-mkconfig -o /boot/grub2/grub.cfg`  
+   You should now see a `/dev/sda3` entry in the grub menu when booting from the internal drive. 
+
+   
+<img src=https://github.com/user-attachments/assets/031862d3-cf70-471e-a41d-7dac48f2723f width="100" height="100">
