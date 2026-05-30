@@ -7,9 +7,9 @@ Creates a Fedora usb drive that will boot on Apple M-series systems (that have A
 
 - The root password is **fedora**  
 - The ```qemu-user-static``` package is needed if building the image on a ```non-aarch64``` system  
-- This project will work with mkosi versions less then or equal to `mkosi v23`
+- This project will work with mkosi versions `25` or `26`
   If needed, you can always install a specific version via pip  
-  `python3 -m pip install --user git+https://github.com/systemd/mkosi.git@v23`
+  `python3 -m pip install --user git+https://github.com/systemd/mkosi.git@v26`
 
 
 To build a minimal Fedora image and install it to a usb drive, simply run:
