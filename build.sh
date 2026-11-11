@@ -174,6 +174,11 @@ rootfs_operations() {
 
     arch-chroot $mkosi_rootfs dnf install -y asahi-platform-metapackage
 
+     # boot directly into a text-based, non-graphical command-line interface
+     arch-chroot $mkosi_rootfs systemctl set-default multi-user.target
+
+    # display a login prompt on the first virtual console (tty1)
+     arch-chroot $mkosi_rootfs systemctl enable getty@tty1.service
 }
 
 install_usb() {
